@@ -1,0 +1,3 @@
+({
+    shouldDeps: ['i-bem', 'jquery']
+})

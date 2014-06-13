@@ -1,0 +1,26 @@
+{
+  "name": "bnsf",
+  "version": "0.0.1",
+  "description": "bnsf",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/apsavin/bnsf.git"
+  },
+  "bugs": "https://github.com/apsavin/bnsf/issues",
+  "ignore": [
+    ".bem/cache",
+    "node_modules",
+    "libs"
+  ],
+  "authors": [
+    "Alexander Savin <box.for.postman@gmail.com>"
+  ],
+  "keywords": [
+    "bem",
+    "node",
+    "spa"
+  ],
+  "dependencies": {
+    "bem-core": "v2.2.2"
+  }
+}
