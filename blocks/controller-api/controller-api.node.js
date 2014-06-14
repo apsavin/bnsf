@@ -1,10 +1,18 @@
+/**@module controller-api*/
 modules.define('controller-api', [
     'i-controller', 'app-api-requester', 'vow'
-], function (provide, Controller, appApiRequester, Vow) {
+], function (provide, IController, appApiRequester, Vow) {
     "use strict";
 
-    provide(Controller.decl({
+    /**
+     * @class ControllerApi
+     * @extends IController
+     */
+    provide(IController.decl(/**@lends ControllerApi.prototype*/{
 
+        /**
+         * @param {Object} data
+         */
         processRequest: function (data) {
             var method = data.request.method,
                 routeParameters = data.route.parameters,

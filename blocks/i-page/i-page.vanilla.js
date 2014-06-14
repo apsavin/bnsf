@@ -1,6 +1,11 @@
+/**@module i-page*/
 modules.define('i-page', function (provide) {
     "use strict";
 
+    /**
+     * @class IPage
+     * @exports
+     */
     provide({
         proto: {},
         static: {

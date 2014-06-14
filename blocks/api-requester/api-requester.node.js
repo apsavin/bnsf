@@ -1,14 +1,27 @@
+/**@module api-requester*/
 modules.define('api-requester', ['app-api-router', 'vow'], function (provide, router, Vow, ApiRequester) {
     "use strict";
 
     var request = require('request');
 
-    provide(ApiRequester.decl({
+    /**
+     * @class ApiRequester
+     * @extends BEM
+     * @exports
+     */
+    provide(ApiRequester.decl(/**@lends ApiRequester.prototype*/{
 
-        sendRequest: function (method, route, routeParams, body) {
-            var url = router.generate(route, routeParams),
+        /**
+         * @param {String} method
+         * @param {String} route
+         * @param {Object} routeParameters
+         * @param {Object} [body]
+         * @returns {vow:Promise}
+         */
+        sendRequest: function (method, route, routeParameters, body) {
+            var url = router.generate(route, routeParameters),
                 deferred = Vow.defer();
-            console.log(route, routeParams, url);
+            console.log(route, routeParameters, url);
             request({
                 url: url,
                 method: method,

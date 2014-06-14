@@ -1,3 +1,4 @@
+/**@module api-requester*/
 modules.define('api-requester', [
     'jquery', 'app-router-base', 'vow', 'functions__debounce'
 ], function (provide, $, router, Vow, debounce, ApiRequester) {
@@ -5,13 +6,34 @@ modules.define('api-requester', [
 
     var apiPath = router.generate('api');
 
-    provide(ApiRequester.decl({
+    /**
+     * @class ApiRequester
+     * @extends BEM
+     * @exports
+     */
+    provide(ApiRequester.decl(/**@lends ApiRequester.prototype*/{
 
         onSetMod: {
             js: {
+                /**
+                 * @constructs
+                 */
                 inited: function () {
+                    /**
+                     * @type {Object.<Array>}
+                     * @private
+                     */
                     this._requests = {};
+                    /**
+                     * @type {Array.<XMLHttpRequest>}
+                     * @private
+                     */
                     this._activeXhrs = [];
+                    /**
+                     *
+                     * @type {Object.<Function>}
+                     * @private
+                     */
                     this._sendDebouncedRequest = {};
 
                     ['get', 'post', 'put', 'patch', 'delete'].forEach(function (method) {
@@ -22,6 +44,13 @@ modules.define('api-requester', [
             }
         },
 
+        /**
+         * @param {String} method
+         * @param {String} route
+         * @param {Object} routeParameters
+         * @param {Object} [body]
+         * @returns {vow:Promise}
+         */
         sendRequest: function (method, route, routeParameters, body) {
             method = method.toLowerCase();
             var deferred = Vow.defer();
@@ -37,6 +66,12 @@ modules.define('api-requester', [
             return deferred.promise();
         },
 
+        /**
+         * @param {String} method
+         * @param {Array} requests
+         * @returns {Object|undefined}
+         * @private
+         */
         _prepareData: function (method, requests) {
             var data;
             if (method === 'post' || method === 'put' || method === 'patch') {
@@ -49,6 +84,12 @@ modules.define('api-requester', [
             return data;
         },
 
+        /**
+         * @param {String} method
+         * @param {Array} requests
+         * @returns {string}
+         * @private
+         */
         _prepareUrl: function (method, requests) {
             var data = {
                 r: requests.map(function (request) {
@@ -61,6 +102,10 @@ modules.define('api-requester', [
             return apiPath + '?' + $.param(data);
         },
 
+        /**
+         * @param {String} method
+         * @private
+         */
         _sendRequest: function (method) {
             var requests = this._requests[method],
                 activeXhrs = this._activeXhrs;
@@ -96,6 +141,10 @@ modules.define('api-requester', [
             }));
         },
 
+        /**
+         * Aborts all active XHRs
+         * @public
+         */
         abort: function () {
             while (this._activeXhrs.length) {
                 this._activeXhrs.pop().abort();

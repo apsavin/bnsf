@@ -1,8 +1,17 @@
+/**@module request-listener*/
 modules.define('request-listener', ['jquery'], function (provide, $, RequestListener) {
     "use strict";
 
-    provide(RequestListener.decl({
+    /**
+     * @class RequestListener
+     * @extends BEM
+     * @exports
+     */
+    provide(RequestListener.decl(/**@lends RequestListener.prototype*/{
 
+        /**
+         * @protected
+         */
         _initListener: function () {
             var _this = this;
             $(document).delegate('a', 'click', function (e) {
