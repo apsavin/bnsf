@@ -10,6 +10,7 @@
     "node": ">=0.10"
   },
   "dependencies": {
+    "lodash.defaults": "2.4.1",
     "bem-environ": "~1.4.0",
     "bem-xjst": "0.4.0",
     "vow": "~0.4.3",
