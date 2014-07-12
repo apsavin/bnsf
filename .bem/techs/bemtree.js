@@ -12,7 +12,7 @@ exports.techMixin = {
 
         var BEMHTML = require('bem-xjst/lib/bemhtml'),
             exportName = this.getExportName(),
-            optimize = false, //process.env[exportName + '_ENV'] !== 'development',
+            optimize = process.env[exportName + '_ENV'] !== 'development',
             code = BEMHTML.generate(sources, {
                 wrap: false,
                 exportName: exportName,
@@ -36,6 +36,6 @@ exports.techMixin = {
             '  })({});\n' +
             "  provide(__bem_xjst); \n" +
             "});\n" +
-            '})(this);'
+            '})(this);';
     }
 };
