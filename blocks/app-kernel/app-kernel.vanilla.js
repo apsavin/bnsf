@@ -179,7 +179,8 @@ modules.define('app-kernel', [
             return {
                 block: Page.getName(),
                 js: true,
-                data: data
+                request: data.request,
+                route: data.route
             };
         }
     });
