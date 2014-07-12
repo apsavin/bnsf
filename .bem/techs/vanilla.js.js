@@ -17,13 +17,11 @@ exports.techMixin = {
 
         return this.__base(decl, levels, output, opts)
             .then(function (res) {
-                return _this._concatTemplates(res, output)
-                    .then(function () {
-                        _this._concatBlocksFromDecl(res, output);
-                        return _this._concatRouting(res, output);
-                    }).then(function () {
-                        return res;
-                    });
+                _this._concatTemplates(res, output);
+                _this._concatBlocksFromDecl(res, output);
+                return _this._concatRouting(res, output).then(function () {
+                    return res;
+                });
 
             });
     },
@@ -118,13 +116,11 @@ exports.techMixin = {
     },
 
     _concatTemplates: function (res, output) {
-        var promises = ['bemhtml', 'bemtree'].map(function (techName) {
-            return this._readFile(output + '.' + techName + '.js');
+        var templates = ['bemhtml', 'bemtree'].map(function (techName) {
+            return this.getBuildResultChunk(output + '.' + techName + '.js');
         }, this);
 
-        return Vow.all(promises).then(function (templates) {
-            this._concat(res, templates.join('\n'));
-        }, this);
+        this._concat(res, templates.join('\n'));
     },
 
     getDependencies: function () {
