@@ -39,16 +39,18 @@ modules.define('api-requester', ['app-api-router', 'vow'], function (provide, ro
                         statusText: res.statusText
                     };
                 }
-                if (err) {
-                    console.log(err);
-                }
-                if (res && (res.statusCode < 200 || res.statusCode > 299)) {
+                var badStatus = res && (res.statusCode < 200 || res.statusCode > 299);
+                if (badStatus) {
                     if (!output.error) {
                         output.error = output.body;
                     }
-                    console.log(output.error);
                 }
-                deferred.resolve(output);
+                if (err || badStatus) {
+                    console.log(output.error);
+                    deferred.reject(output);
+                } else {
+                    deferred.resolve(output);
+                }
             });
             return deferred.promise();
         },
