@@ -47,8 +47,8 @@ modules.define('api-requester', [
         /**
          * @param {String} method
          * @param {String} route
-         * @param {Object} routeParameters
-         * @param {Object} [body]
+         * @param {Object} [routeParameters]
+         * @param {String|Object} [body]
          * @returns {vow:Promise}
          */
         sendRequest: function (method, route, routeParameters, body) {
@@ -115,15 +115,24 @@ modules.define('api-requester', [
                 type: method,
                 dataType: 'json',
                 data: this._prepareData(method, requests),
-                success: function (responses) {
-                    responses.forEach(function (response, i) {
-                        var deferred = requests[i].deferred;
-                        if (response.error) {
-                            deferred.reject(response);
-                        } else {
-                            deferred.resolve(response);
-                        }
-                    });
+                success: function (responses, status, xhr) {
+                    if (responses.forEach) {
+                        responses.forEach(function (response, i) {
+                            var deferred = requests[i].deferred;
+                            if (response.error) {
+                                deferred.reject(response);
+                            } else {
+                                deferred.resolve(response);
+                            }
+                        });
+                    } else {
+                        requests.forEach(function (request) {
+                            request.deferred.reject({
+                                error: responses,
+                                response: xhr
+                            });
+                        });
+                    }
                 },
                 error: function (xhr, statusText, error) {
                     requests.forEach(function (request) {

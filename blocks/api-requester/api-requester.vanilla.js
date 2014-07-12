@@ -11,7 +11,7 @@ modules.define('api-requester', ['i-bem'], function (provide, BEM) {
 
         /**
          * @param {String} route
-         * @param {Object} routeParameters
+         * @param {Object} [routeParameters]
          * @returns {vow:Promise}
          */
         get: function (route, routeParameters) {
@@ -20,8 +20,8 @@ modules.define('api-requester', ['i-bem'], function (provide, BEM) {
 
         /**
          * @param {String} route
-         * @param {Object} routeParameters
-         * @param {Object} body
+         * @param {Object} [routeParameters]
+         * @param {Object} [body]
          * @returns {vow:Promise}
          */
         post: function (route, routeParameters, body) {
@@ -30,8 +30,8 @@ modules.define('api-requester', ['i-bem'], function (provide, BEM) {
 
         /**
          * @param {String} route
-         * @param {Object} routeParameters
-         * @param {Object} body
+         * @param {Object} [routeParameters]
+         * @param {Object} [body]
          * @returns {vow:Promise}
          */
         put: function (route, routeParameters, body) {
@@ -40,8 +40,8 @@ modules.define('api-requester', ['i-bem'], function (provide, BEM) {
 
         /**
          * @param {String} route
-         * @param {Object} routeParameters
-         * @param {Object} body
+         * @param {Object} [routeParameters]
+         * @param {Object} [body]
          * @returns {vow:Promise}
          */
         patch: function (route, routeParameters, body) {
@@ -50,7 +50,7 @@ modules.define('api-requester', ['i-bem'], function (provide, BEM) {
 
         /**
          * @param {String} route
-         * @param {Object} routeParameters
+         * @param {Object} [routeParameters]
          * @returns {vow:Promise}
          */
         del: function (route, routeParameters) {
@@ -60,8 +60,8 @@ modules.define('api-requester', ['i-bem'], function (provide, BEM) {
         /**
          * @param {String} method
          * @param {String} route
-         * @param {Object} routeParameters
-         * @param {Object} [body]
+         * @param {Object} [routeParameters]
+         * @param {String|Object} [body]
          * @returns {vow:Promise}
          */
         sendRequest: function (method, route, routeParameters, body) {
