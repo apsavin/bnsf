@@ -1,3 +1,3 @@
 ({
-    shouldDeps: ['i-bem', 'jquery']
+    shouldDeps: ['i-bem', 'jquery', 'app-navigation']
 })

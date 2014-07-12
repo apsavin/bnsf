@@ -1,0 +1,5 @@
+block('page-404').content()([
+    {
+        content: '404 not found'
+    }
+]);

@@ -75,11 +75,11 @@ modules.define('app-kernel', [
          * @private
          */
         _onRequest: function (e, data) {
-            var route = this._getRoute(data.request);
+            var route = data.route || this._getRoute(data.request);
 
             if (!route) {
                 console.log('Route for request ', data.request.url, ' not found');
-                return;
+                route = {id: 'page-404'};
             }
 
             data.route = route;
@@ -93,9 +93,10 @@ modules.define('app-kernel', [
             var Page = this._pages[route.id];
 
             if (!Page) {
-                console.log('Page for route ', route.id, ' not found');
-                return;
+                throw new Error('Page for route ' + route.id + ' not found');
             }
+
+            console.log('Start process page', route.id);
 
             this._processPage(Page, data).then(function () {
                 this._onPageProcessSuccess(data);
@@ -107,7 +108,6 @@ modules.define('app-kernel', [
          * @protected
          */
         _onPageProcessSuccess: function (data) {
-
         },
 
         /**
@@ -115,6 +115,7 @@ modules.define('app-kernel', [
          * @protected
          */
         _onPageProcessError: function (e) {
+            console.log('Error process page', e);
             throw e;
         },
 
@@ -165,7 +166,7 @@ modules.define('app-kernel', [
          * @protected
          */
         _getBEMJSON: function (Page, data) {
-            return this._getPageContentBEMJSON(Page, data)
+            return this._getPageContentBEMJSON(Page, data);
         },
 
         /**

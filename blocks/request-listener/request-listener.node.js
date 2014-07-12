@@ -53,7 +53,7 @@ modules.define('request-listener', function (provide, RequestListener) {
         getDefaultParams: function () {
             return {
                 port: 3000
-            }
+            };
         }
 
     }));

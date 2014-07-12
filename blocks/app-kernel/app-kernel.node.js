@@ -59,7 +59,7 @@ modules.define('app-kernel', ['i-bem', 'controllers'], function (provide, BEM, c
          * @protected
          */
         _getBEMJSON: function (Page, data) {
-            return this._getPageBEMJSON(Page, data)
+            return this._getPageBEMJSON(Page, data);
         },
 
         /**
@@ -80,6 +80,9 @@ modules.define('app-kernel', ['i-bem', 'controllers'], function (provide, BEM, c
                 },
                 scripts: [
                     {elem: 'js', url: '//localhost:8080/desktop.bundles/index/_index.js'}
+                ],
+                styles: [
+                    {elem: 'css', url: '//localhost:8080/desktop.bundles/index/_index.css'}
                 ],
                 content: this._getPageContentBEMJSON(Page, data)
             };

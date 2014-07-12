@@ -43,8 +43,8 @@ modules.define('controller-api', [
                 return;
             }
 
-            Vow.all(promises).spread(function () {
-                response.end(JSON.stringify(Array.prototype.slice.call(arguments)));
+            Vow.all(promises).then(function (responses) {
+                response.end(JSON.stringify(responses));
             });
         }
     }, {

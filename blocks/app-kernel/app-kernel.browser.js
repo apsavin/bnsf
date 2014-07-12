@@ -1,7 +1,7 @@
 /**@module app-kernel*/
 modules.define('app-kernel', [
-    'i-bem__dom', 'history', 'app-api-requester'
-], function (provide, BEMDOM, History, appApiRequester, appKernelDecl) {
+    'i-bem__dom', 'app-api-requester', 'app-navigation'
+], function (provide, BEMDOM, appApiRequester, navigation, appKernelDecl) {
     "use strict";
 
     /**
@@ -19,11 +19,6 @@ modules.define('app-kernel', [
                 inited: function () {
                     this.__base();
                     this._cacheCurrentPage(this.params.currentPage);
-                    /**
-                     * @type {History}
-                     * @private
-                     */
-                    this._history = new History();
                 }
             }
         },
@@ -67,10 +62,7 @@ modules.define('app-kernel', [
          * @protected
          */
         _onPageProcessSuccess: function (data) {
-            //when request comes from window popstate event, url already updated
-            if (!data.request.isUrlUpdated) {
-                this._history.pushState(null, '', data.request.url);
-            }
+            navigation.navigate(data);
         },
 
         /**

@@ -1,5 +1,5 @@
 /**@module request-listener*/
-modules.define('request-listener', ['jquery'], function (provide, $, RequestListener) {
+modules.define('request-listener', ['jquery', 'app-navigation'], function (provide, $, navigation, RequestListener) {
     "use strict";
 
     /**
@@ -15,8 +15,8 @@ modules.define('request-listener', ['jquery'], function (provide, $, RequestList
         _initListener: function () {
             var _this = this;
             $(document).delegate('a', 'click', function (e) {
-                if (!e.metaKey && !e.ctrlKey && this.protocol === location.protocol
-                    && this.host === location.host && !this.attributes.target) {
+                if (!e.metaKey && !e.ctrlKey && this.protocol === location.protocol &&
+                    this.host === location.host && !this.attributes.target) {
                     e.preventDefault();
                     _this._handleRequest({
                         request: {
@@ -26,15 +26,9 @@ modules.define('request-listener', ['jquery'], function (provide, $, RequestList
                     });
                 }
             });
-            $(window).on('popstate', function () {
-                _this._handleRequest({
-                    request: {
-                        url: location.pathname + location.search,
-                        isUrlUpdated: true,
-                        method: 'GET'
-                    }
-                });
-            });
+            navigation.on('request', function (e, data) {
+                this._handleRequest(data);
+            }, this);
         }
 
     }));
