@@ -31,10 +31,14 @@ modules.define('controller-api', [
             routes = Array.isArray(routes) ? routes : [routes];
             routesParameters = Array.isArray(routesParameters) ? routesParameters : [routesParameters];
 
-            var promises = [];
+            var promises = [],
+                parameters,
+                body;
             try {
                 for (var i = 0, l = routes.length; i < l; i++) {
-                    promises.push(appApiRequester.sendRequest(method, routes[i], JSON.parse(routesParameters[i]), bodies[i]));
+                    parameters = JSON.parse(routesParameters[i]);
+                    body = bodies[i] === 'null' ? undefined : bodies[i];
+                    promises.push(appApiRequester.sendRequest(method, routes[i], parameters, body));
                 }
             } catch (e) {
                 response.end(JSON.stringify({
