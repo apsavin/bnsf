@@ -22,5 +22,8 @@
   ],
   "dependencies": {
     "bem-core": "v2.2.2"
+  },
+  "devDependencies" : {
+    "bem-pr" : "narqo/bem-pr#0.8.1-beta3"
   }
 }

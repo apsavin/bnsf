@@ -11,7 +11,6 @@
   },
   "dependencies": {
     "lodash.defaults": "2.4.1",
-    "bem-environ": "~1.4.0",
     "bem-xjst": "0.4.0",
     "vow": "~0.4.3",
     "router-base": "0.0.3",
@@ -26,7 +25,13 @@
     "spa"
   ],
   "devDependencies": {
-    "bem": "0.8.1"
+    "bem": "0.8.1",
+    "bem-environ": "~1.4.0",
+    "bower": "~1.2.8",
+    "bower-npm-install": "~0.5.4"
+  },
+  "scripts": {
+    "deps": "bower-npm-install --non-interactive"
   },
   "private": true
 }

@@ -6,3 +6,4 @@ node_modules/
 .project
 
 .bem/cache/
+blocks.specs

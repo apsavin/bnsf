@@ -1,5 +1,5 @@
 /**@module api-requester*/
-modules.define('api-requester', ['app-api-router', 'vow'], function (provide, router, Vow, ApiRequester) {
+modules.define('api-requester', ['vow'], function (provide, Vow, ApiRequester) {
     "use strict";
 
     var request = require('request');
@@ -19,7 +19,7 @@ modules.define('api-requester', ['app-api-router', 'vow'], function (provide, ro
          * @returns {vow:Promise}
          */
         sendRequest: function (method, route, routeParameters, body) {
-            var url = router.generate(route, routeParameters),
+            var url = this.params.router.generate(route, routeParameters),
                 deferred = Vow.defer(),
                 _this = this;
             console.log(route, routeParameters, url);

@@ -4,10 +4,25 @@ modules.define('api-requester', ['i-bem'], function (provide, BEM) {
 
     /**
      * @class ApiRequester
+     * @param {RouterBase} router
+     * @throws if router is absent
      * @extends BEM
      * @exports
      */
     provide(BEM.decl(this.name, /**@lends ApiRequester.prototype*/{
+
+        onSetMod: {
+            js: {
+                /**
+                 * @constructs
+                 */
+                inited: function () {
+                    if (!this.params.router) {
+                        throw new Error('Required parameter router is not found');
+                    }
+                }
+            }
+        },
 
         /**
          * @param {String} route

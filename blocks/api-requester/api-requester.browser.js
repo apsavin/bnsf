@@ -1,10 +1,8 @@
 /**@module api-requester*/
 modules.define('api-requester', [
-    'jquery', 'app-router-base', 'vow', 'functions__debounce'
-], function (provide, $, router, Vow, debounce, ApiRequester) {
+    'jquery', 'vow', 'functions__debounce'
+], function (provide, $, Vow, debounce, ApiRequester) {
     "use strict";
-
-    var apiPath = router.generate('api');
 
     /**
      * @class ApiRequester
@@ -19,6 +17,7 @@ modules.define('api-requester', [
                  * @constructs
                  */
                 inited: function () {
+                    this.__base();
                     /**
                      * @type {Object.<Array>}
                      * @private
@@ -35,6 +34,12 @@ modules.define('api-requester', [
                      * @private
                      */
                     this._sendDebouncedRequest = {};
+
+                    /**
+                     * @type {String}
+                     * @private
+                     */
+                    this._apiPath = this.params.router.generate('api');
 
                     ['get', 'post', 'put', 'patch', 'delete'].forEach(function (method) {
                         this._requests[method] = [];
@@ -99,7 +104,7 @@ modules.define('api-requester', [
                     return JSON.stringify(request.data.routeParameters || null);
                 })
             };
-            return apiPath + '?' + $.param(data);
+            return this._apiPath + '?' + $.param(data);
         },
 
         /**
