@@ -1,5 +1,5 @@
 /**@module api-requester*/
-modules.define('api-requester', ['vow'], function (provide, Vow, ApiRequester) {
+modules.define('api-requester', ['vow', 'app-logger'], function (provide, Vow, logger, ApiRequester) {
     "use strict";
 
     var request = require('request');
@@ -22,7 +22,7 @@ modules.define('api-requester', ['vow'], function (provide, Vow, ApiRequester) {
             var url = this.params.router.generate(route, routeParameters),
                 deferred = Vow.defer(),
                 _this = this;
-            console.log(route, routeParameters, url);
+
             request({
                 url: url,
                 method: method,
@@ -46,7 +46,7 @@ modules.define('api-requester', ['vow'], function (provide, Vow, ApiRequester) {
                     }
                 }
                 if (err || badStatus) {
-                    console.log(output.error);
+                    logger.warn(output.error);
                     deferred.reject(output);
                 } else {
                     deferred.resolve(output);
@@ -81,8 +81,5 @@ modules.define('api-requester', ['vow'], function (provide, Vow, ApiRequester) {
             }
             return body;
         }
-
     }));
-
 });
-

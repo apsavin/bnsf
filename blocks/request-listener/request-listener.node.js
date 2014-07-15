@@ -1,5 +1,5 @@
 /**@module request-listener*/
-modules.define('request-listener', function (provide, RequestListener) {
+modules.define('request-listener', ['app-logger'], function (provide, logger, RequestListener) {
     "use strict";
 
     var http = require('http');
@@ -35,7 +35,7 @@ modules.define('request-listener', function (provide, RequestListener) {
         _initListener: function () {
             this._server = http.createServer(this._getServerCallback());
             this._server.listen(this.params.port);
-            console.log('server started at port ', this.params.port);
+            logger.info('server started at port ', this.params.port);
         },
 
         /**

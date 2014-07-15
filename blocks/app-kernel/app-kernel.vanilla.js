@@ -1,7 +1,7 @@
 /**@module app-kernel*/
 modules.define('app-kernel', [
-    'request-listener', 'app-router-base', 'BEMTREE', 'BEMHTML', 'pages'
-], function (provide, RequestListener, appRouterBase, BEMTREE, BEMHTML, pages) {
+    'request-listener', 'app-router-base', 'BEMTREE', 'BEMHTML', 'pages', 'app-logger'
+], function (provide, RequestListener, appRouterBase, BEMTREE, BEMHTML, pages, logger) {
     "use strict";
 
     /**
@@ -78,7 +78,7 @@ modules.define('app-kernel', [
             var route = data.route || this._getRoute(data.request);
 
             if (!route) {
-                console.log('Route for request ', data.request.url, ' not found');
+                logger.info('Route for request ', data.request.url, ' not found');
                 route = {id: 'page-404'};
             }
 
@@ -93,10 +93,12 @@ modules.define('app-kernel', [
             var Page = this._pages[route.id];
 
             if (!Page) {
-                throw new Error('Page for route ' + route.id + ' not found');
+                var errorMessage = 'Page for route ' + route.id + ' not found';
+                logger.error(errorMessage);
+                throw new Error(errorMessage);
             }
 
-            console.log('Start process page', route.id);
+            logger.info('Start process page', route.id);
 
             this._processPage(Page, data).then(function () {
                 this._onPageProcessSuccess(data);
@@ -115,7 +117,7 @@ modules.define('app-kernel', [
          * @protected
          */
         _onPageProcessError: function (e) {
-            console.log('Error process page', e);
+            logger.error('Error process page', e);
             throw e;
         },
 

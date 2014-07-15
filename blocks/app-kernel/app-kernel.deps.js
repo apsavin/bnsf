@@ -4,6 +4,6 @@
     ],
     shouldDeps: [
         'functions', 'app-router-base', 'i-page', 'request-listener', 'app-api-requester', 'app-navigation',
-        'vow', 'page', 'page-404', {block: 'app-kernel', mods: {'init-auto': true}}
+        'vow', 'page', 'page-404', {block: 'app-kernel', mods: {'init-auto': true}}, 'app-logger'
     ]
 })
