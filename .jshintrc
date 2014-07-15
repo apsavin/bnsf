@@ -1,0 +1,46 @@
+{
+    "passfail"      : true,   // Stop on first error.
+    "maxerr"        : 100,    // Maximum error before stopping.
+
+    "browser"       : true,   // Standard browser globals e.g. `window`, `document`.
+    "node"          : true,
+
+    "predef"        : [
+        "modules",
+        //for bemhtml and bemtree
+        "block",
+        "elem",
+        "mod",
+        "content",
+        "tag",
+        "attrs",
+        "js",
+        "bem",
+        "match",
+        "applyNext",
+        "applyCtx",
+        // for bemtree
+        "path",
+        "get",
+        //for tests
+        "describe",
+        "it"
+    ],
+
+    "unused"        : "vars",
+    "curly"         : true,   // Require {} for every new block or scope.
+    "eqeqeq"        : true,   // Require triple equals i.e. `===`.
+    "eqnull"        : true,   // Tolerate use of `== null`.
+    "immed"         : true,   // Require immediate invocations to be wrapped in parens e.g. `( function(){}() );`
+    "latedef"       : true,   // Prohibit variable use before definition.
+    "noarg"         : true,   // Prohibit use of `arguments.caller` and `arguments.callee`.
+    "scripturl"     : true,   // Tolerate script-targeted URLs.
+    "supernew"      : true,  // Tolerate `new function () { ... };` and `new Object;`.
+    "undef"         : true,   // Require all non-global variables be declared before they are used.
+
+    "newcap"        : true,   // Require capitalization of all constructor functions e.g. `new F()`.
+    "noempty"       : true,   // Prohibit use of empty blocks.
+    "nonew"         : true,   // Prohibit use of constructors for side-effects.
+    "sub"           : true,   // Tolerate all forms of subscript notation besides dot notation e.g. `dict['key']` instead of `dict.key`.
+    "trailing"      : true   // Prohibit trailing whitespaces.
+}
