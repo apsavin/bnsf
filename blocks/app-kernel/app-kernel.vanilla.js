@@ -5,10 +5,24 @@ modules.define('app-kernel', [
     "use strict";
 
     /**
+     * @typedef {Object} RequestData
+     * @property {{url: String, method: String}} request
+     * @property {Route} route
+     * @property {{error: String, handled: ?Boolean, response: [{statusCode: Number, statusText: String}]}} error
+     */
+
+    /**
      * @class AppKernel
      * @exports
      */
     provide(/**@lends AppKernel.prototype*/{
+
+        getDefaultParams: function () {
+            return {
+                page404: 'page-404',
+                page500: 'page-500'
+            };
+        },
 
         onSetMod: {
             js: {
@@ -79,7 +93,7 @@ modules.define('app-kernel', [
 
             if (!route) {
                 logger.info('Route for request ', data.request.url, ' not found');
-                route = {id: 'page-404'};
+                route = {id: this.params.page404};
             }
 
             data.route = route;
@@ -90,46 +104,71 @@ modules.define('app-kernel', [
                 return;
             }
 
-            var Page = this._pages[route.id];
-
-            if (!Page) {
-                var errorMessage = 'Page for route ' + route.id + ' not found';
-                logger.error(errorMessage);
-                throw new Error(errorMessage);
-            }
-
-            logger.info('Start process page', route.id);
-
-            this._processPage(Page, data).then(function () {
-                this._onPageProcessSuccess(data);
-            }, this._onPageProcessError, this);
+            this._processPage(route.id, data);
         },
 
         /**
-         * @param {Object} data
+         * @param {RequestData} data
          * @protected
          */
         _onPageProcessSuccess: function (data) {
         },
 
         /**
-         * @param {Error} e
+         * @param {RequestData} data
          * @protected
          */
-        _onPageProcessError: function (e) {
-            logger.error('Error process page', e);
-            throw e;
+        _onPageProcessError: function (data) {
+            var e = data.error;
+            if (e.handled) {
+                logger.error(data);
+                throw new Error(data);
+            }
+            e.handled = true;
+            if (e.response && e.response.statusCode === 404) {
+                this._processPage(this.params.page404, data);
+                logger.info('Error process page', data.request.url, data.request.method, e);
+            } else {
+                this._processPage(this.params.page500, data);
+                logger.error('Error process page', data.request.url, data.request.method, e);
+            }
         },
 
         /**
-         * @param {Function} Page
-         * @param {Object} data
+         * @param {String} page
+         * @param {RequestData} data
          * @returns {vow:Promise}
-         * @private
+         * @protected
          */
-        _processPage: function (Page, data) {
-            return BEMTREE.apply(this._getBEMJSON(Page, data)).then(function (bemjson) {
+        _processPage: function (page, data) {
+            var Page = this._pages[page];
+
+            if (!Page) {
+                var errorMessage = 'Page "' + page + '" not found';
+                logger.error(errorMessage);
+                throw new Error(errorMessage);
+            }
+
+            logger.info('Start process page', page);
+            var promise = BEMTREE.apply(this._getBEMJSON(Page, data)).then(function (bemjson) {
                 this._writeResponse(BEMHTML.apply(bemjson), data, Page);
+                return data;
+            }, this);
+            return this._postProcessPage(promise, data);
+        },
+
+        /**
+         * @param {vow:Promise} promise
+         * @param {RequestData} data
+         * @returns {vow:Promise}
+         * @protected
+         */
+        _postProcessPage: function (promise, data) {
+            return promise.then(function () {
+                return this._onPageProcessSuccess(data);
+            }, function (e) {
+                data.error = e;
+                return this._onPageProcessError(data);
             }, this);
         },
 
@@ -144,7 +183,7 @@ modules.define('app-kernel', [
 
         /**
          * @param {IController} controller
-         * @param {Object} data
+         * @param {RequestData} data
          * @protected
          */
         _processController: function (controller, data) {
@@ -153,7 +192,7 @@ modules.define('app-kernel', [
 
         /**
          * @param {String} html
-         * @param {Object} data
+         * @param {RequestData} data
          * @param {Function} Page
          * @protected
          */
@@ -163,7 +202,7 @@ modules.define('app-kernel', [
 
         /**
          * @param {Function} Page
-         * @param {Object} data
+         * @param {RequestData} data
          * @returns {Object}
          * @protected
          */
@@ -173,7 +212,7 @@ modules.define('app-kernel', [
 
         /**
          * @param {Function} Page
-         * @param {Object} data
+         * @param {RequestData} data
          * @returns {Object}
          * @protected
          */

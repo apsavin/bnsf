@@ -3,6 +3,12 @@ modules.define('app-kernel', ['i-bem', 'controllers'], function (provide, BEM, c
     "use strict";
 
     /**
+     * @typedef {RequestData} NodeRequestData
+     * @property {IncomingMessage} request
+     * @property {OutgoingMessage} response
+     */
+
+    /**
      * @class AppKernel
      * @extends BEM
      * @exports
@@ -45,16 +51,28 @@ modules.define('app-kernel', ['i-bem', 'controllers'], function (provide, BEM, c
 
         /**
          * @param {String} html
-         * @param {Object} data
+         * @param {NodeRequestData} data
          * @protected
          */
         _writeResponse: function (html, data) {
-            data.response.end(html);
+            var response = data.response,
+                statusCode = 200;
+            if (data.error) {
+                statusCode = 500;
+                if (data.error.response && data.error.response.statusCode) {
+                    statusCode = data.error.response.statusCode;
+                }
+            }
+            response.writeHead(statusCode, {
+                'Content-Length': Buffer.byteLength(html),
+                'Content-Type': 'text/html'
+            });
+            response.end(html);
         },
 
         /**
          * @param {Function} Page
-         * @param {String} data
+         * @param {NodeRequestData} data
          * @returns {Object}
          * @protected
          */
@@ -64,7 +82,7 @@ modules.define('app-kernel', ['i-bem', 'controllers'], function (provide, BEM, c
 
         /**
          * @param {Function} Page
-         * @param {String} data
+         * @param {NodeRequestData} data
          * @returns {Object}
          * @protected
          */
@@ -98,7 +116,7 @@ modules.define('app-kernel', ['i-bem', 'controllers'], function (provide, BEM, c
 
         /**
          * @param {IController} controller
-         * @param {Object} data
+         * @param {NodeRequestData} data
          * @private
          */
         _processController: function (controller, data) {

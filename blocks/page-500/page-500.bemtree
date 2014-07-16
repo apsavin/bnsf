@@ -1,0 +1,5 @@
+block('page-500').content()([
+    {
+        content: 'Server error 500'
+    }
+]);

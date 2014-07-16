@@ -33,27 +33,27 @@ modules.define('app-kernel', [
         },
 
         /**
-         * @param {Function} Page
+         * @param {String} page
          * @returns {boolean}
          * @private
          */
-        _isPartialUpdateAvailable: function (Page) {
-            return this._currentPageName === Page.getName() && typeof this._currentPage.update === 'function';
+        _isPartialUpdateAvailable: function (page) {
+            return this._currentPageName === page && typeof this._currentPage.update === 'function';
         },
 
         /**
-         * @param {Function} Page
+         * @param {String} page
          * @param {Object} data
          * @returns {vow:Promise}
          * @protected
          */
-        _processPage: function (Page, data) {
+        _processPage: function (page, data) {
             //abort all app requests on page change
             appApiRequester.abort();
-            if (this._isPartialUpdateAvailable(Page)) {
-                return this._currentPage.update(data);
+            if (this._isPartialUpdateAvailable(page)) {
+                return this._postProcessPage(this._currentPage.update(data), data);
             } else {
-                return this.__base(Page, data);
+                return this.__base(page, data);
             }
         },
 
