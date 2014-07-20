@@ -21,7 +21,7 @@
     "spa"
   ],
   "dependencies": {
-    "bem-core": "v2.2.2"
+    "bem-core": "v2.3.0"
   },
   "devDependencies" : {
     "bem-pr" : "narqo/bem-pr#0.8.1-beta3"
