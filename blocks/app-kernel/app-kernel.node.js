@@ -27,6 +27,27 @@ modules.define('app-kernel', ['i-bem', 'controllers'], function (provide, BEM, c
         },
 
         /**
+         * @protected
+         * @returns {{requestListenerPort: number}}
+         */
+        getDefaultParams: function () {
+            return {
+                requestListenerPort: 3000,
+                staticHost: 'localhost:8080'
+            };
+        },
+
+        /**
+         * @returns {{}}
+         * @protected
+         */
+        _getRequestListenerParams: function () {
+            return {
+                port: this.params.requestListenerPort
+            };
+        },
+
+        /**
          * @returns {Array.<String>}
          * @private
          */
@@ -97,10 +118,10 @@ modules.define('app-kernel', ['i-bem', 'controllers'], function (provide, BEM, c
                     }
                 },
                 scripts: [
-                    {elem: 'js', url: '//localhost:8080/desktop.bundles/index/_index.js'}
+                    {elem: 'js', url: '//' + this.params.staticHost + '/desktop.bundles/index/_index.js'}
                 ],
                 styles: [
-                    {elem: 'css', url: '//localhost:8080/desktop.bundles/index/_index.css'}
+                    {elem: 'css', url: '//' + this.params.staticHost + '/desktop.bundles/index/_index.css'}
                 ],
                 content: this._getPageContentBEMJSON(Page, data)
             };

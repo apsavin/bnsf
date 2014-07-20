@@ -61,12 +61,18 @@ modules.define('app-kernel', [
         },
 
         /**
+         * @returns {{}}
+         * @protected
+         */
+        _getRequestListenerParams: function () {
+            return {};
+        },
+
+        /**
          * @private
          */
         _initRequestListener: function () {
-            this._requestListener = new RequestListener(null, {
-                port: 3000
-            });
+            this._requestListener = new RequestListener(null, this._getRequestListenerParams());
             this._requestListener.on('request', this._onRequest, this);
         },
 
