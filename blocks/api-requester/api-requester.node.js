@@ -1,8 +1,12 @@
 /**@module api-requester*/
-modules.define('api-requester', ['vow', 'app-logger'], function (provide, Vow, logger, ApiRequester) {
+modules.define('api-requester', [
+    'vow', 'app-logger', 'objects'
+], function (provide, Vow, logger, objects, ApiRequester) {
     "use strict";
 
-    var request = require('request');
+    var request = require('request'),
+        URL = require('url'),
+        defaultCookieStorage = {};
 
     /**
      * @class ApiRequester
@@ -10,6 +14,12 @@ modules.define('api-requester', ['vow', 'app-logger'], function (provide, Vow, l
      * @exports
      */
     provide(ApiRequester.decl(/**@lends ApiRequester.prototype*/{
+
+        getDefaultParams: function () {
+            return objects.extend({
+                cookieStorage: defaultCookieStorage
+            }, this.__base());
+        },
 
         /**
          * @param {String} method
@@ -21,19 +31,31 @@ modules.define('api-requester', ['vow', 'app-logger'], function (provide, Vow, l
         sendRequest: function (method, route, routeParameters, body) {
             var url = this.params.router.generate(route, routeParameters),
                 deferred = Vow.defer(),
-                _this = this;
+                parsedUrl = URL.parse(url),
+                _this = this,
+                cookieStorage = this.params.cookieStorage,
+                cookieId = parsedUrl.protocol + parsedUrl.host;
+
+            cookieStorage.cookies = cookieStorage.cookies || {};
+
+            var jar = request.jar();
+            if (cookieStorage.cookies[cookieId]) {
+                jar.setCookie(cookieStorage.cookies[cookieId], url);
+            }
 
             request({
                 url: url,
                 method: method,
                 headers: this._getRequestHeaders(route),
-                body: typeof body === 'object' ? JSON.stringify(body) : body
+                body: typeof body === 'object' ? JSON.stringify(body) : body,
+                jar: jar
             }, function (err, res, body) {
                 var output = {
                     error: err ? err.message : '',
                     body: _this._processBody(res, body)
                 };
                 if (res) {
+                    cookieStorage.cookies[cookieId] = jar.getCookieString(url);
                     output.response = {
                         statusCode: res.statusCode,
                         statusText: res.statusText

@@ -1,3 +1,3 @@
 ({
-    mustDeps: ['i-controller', 'app-api-requester']
+    mustDeps: ['i-controller', 'vow']
 })

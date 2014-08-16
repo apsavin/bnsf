@@ -1,7 +1,7 @@
 /**@module controller-api*/
 modules.define('controller-api', [
-    'i-controller', 'app-api-requester', 'vow'
-], function (provide, IController, appApiRequester, Vow) {
+    'i-controller', 'vow'
+], function (provide, IController, Vow) {
     "use strict";
 
     /**
@@ -11,7 +11,7 @@ modules.define('controller-api', [
     provide(IController.decl(/**@lends ControllerApi.prototype*/{
 
         /**
-         * @param {Object} data
+         * @param {NodeRequestData} data
          */
         processRequest: function (data) {
             var method = data.request.method,
@@ -19,12 +19,13 @@ modules.define('controller-api', [
                 bodies = (data.request.body ? data.request.body.bodies : []) || [],
                 routes = routeParameters['r[]'],
                 routesParameters = routeParameters['rP[]'] || [],
-                response = data.response;
+                response = data.response,
+                apiRequester = data.apiRequester;
 
             if (!routes) {
-                response.end(JSON.stringify({
+                this._sendJSON(response, {
                     error: 'no requests'
-                }));
+                });
                 return;
             }
 
@@ -38,20 +39,20 @@ modules.define('controller-api', [
                 for (var i = 0, l = routes.length; i < l; i++) {
                     parameters = JSON.parse(routesParameters[i]);
                     body = bodies[i] === 'null' ? undefined : bodies[i];
-                    promises.push(appApiRequester.sendRequest(method, routes[i], parameters, body));
+                    promises.push(apiRequester.sendRequest(method, routes[i], parameters, body));
                 }
             } catch (e) {
-                response.end(JSON.stringify({
+                this._sendJSON(response, {
                     error: e.message
-                }));
+                });
                 return;
             }
 
             Vow.allResolved(promises).then(function (promises) {
-                response.end(JSON.stringify(promises.map(function (promise) {
+                this._sendJSON(response, promises.map(function (promise) {
                     return promise.valueOf();
-                })));
-            });
+                }));
+            }, this);
         }
     }, {
 

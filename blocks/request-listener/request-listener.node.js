@@ -17,7 +17,22 @@ modules.define('request-listener', ['app-logger'], function (provide, logger, Re
          */
         _getMiddleware: function () {
             return require('connect')()
-                .use(require('body-parser')());
+                .use(require('body-parser')())
+                .use(require('express-session')(this._getSessionParams()));
+        },
+
+        /**
+         * @returns {{name: string, secret: string}}
+         * @protected
+         */
+        _getSessionParams: function () {
+            logger.warn('Redefine RequestListener#_getSessionParams: defaults are not safe.');
+            return {
+                name: 'sid',
+                secret: 'your secret',
+                resave: false,
+                saveUninitialized: true
+            };
         },
 
         /**

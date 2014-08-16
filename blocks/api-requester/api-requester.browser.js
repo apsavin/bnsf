@@ -115,7 +115,7 @@ modules.define('api-requester', [
             var requests = this._requests[method],
                 activeXhrs = this._activeXhrs;
             this._requests[method] = [];
-            this._activeXhrs.push($.ajax({
+            activeXhrs.push($.ajax({
                 url: this._prepareUrl(method, requests),
                 type: method,
                 dataType: 'json',

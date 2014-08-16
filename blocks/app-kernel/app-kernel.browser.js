@@ -1,7 +1,7 @@
 /**@module app-kernel*/
 modules.define('app-kernel', [
     'i-bem__dom', 'app-api-requester', 'app-navigation'
-], function (provide, BEMDOM, appApiRequester, navigation, appKernelDecl) {
+], function (provide, BEMDOM, apiRequester, navigation, appKernelDecl) {
     "use strict";
 
     /**
@@ -21,6 +21,17 @@ modules.define('app-kernel', [
                     this._cacheCurrentPage(this.params.currentPage);
                 }
             }
+        },
+
+        /**
+         * @param {RequestData} data
+         * @returns {RequestData}
+         * @protected
+         */
+        _fillRequestData: function (data) {
+            data = this.__base(data);
+            data.apiRequester = apiRequester;
+            return data;
         },
 
         /**
@@ -49,7 +60,7 @@ modules.define('app-kernel', [
          */
         _processPage: function (page, data) {
             //abort all app requests on page change
-            appApiRequester.abort();
+            apiRequester.abort();
             if (this._isPartialUpdateAvailable(page)) {
                 return this._postProcessPage(this._currentPage.update(data), data);
             } else {

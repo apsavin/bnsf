@@ -1,13 +1,14 @@
 /**@module app-kernel*/
 modules.define('app-kernel', [
-    'request-listener', 'app-router-base', 'BEMTREE', 'BEMHTML', 'pages', 'app-logger'
-], function (provide, RequestListener, appRouterBase, BEMTREE, BEMHTML, pages, logger) {
+    'request-listener', 'app-router-base', 'BEMTREE', 'BEMHTML', 'pages', 'app-logger', 'vow'
+], function (provide, RequestListener, appRouterBase, BEMTREE, BEMHTML, pages, logger, Vow) {
     "use strict";
 
     /**
      * @typedef {Object} RequestData
      * @property {{url: String, method: String}} request
      * @property {Route} route
+     * @property {ApiRequester} apiRequester
      * @property {{error: String, handled: ?Boolean, response: [{statusCode: Number, statusText: String}]}} error
      */
 
@@ -95,6 +96,23 @@ modules.define('app-kernel', [
          * @private
          */
         _onRequest: function (e, data) {
+            this._processRequest(this._fillRequestData(data));
+        },
+
+        /**
+         * @param {RequestData} data
+         * @protected
+         */
+        _processRequest: function (data) {
+            this._processPage(data.route.id, data);
+        },
+
+        /**
+         * @param {RequestData} data
+         * @returns {RequestData}
+         * @protected
+         */
+        _fillRequestData: function (data) {
             var route = data.route || this._getRoute(data.request);
 
             if (!route) {
@@ -103,14 +121,7 @@ modules.define('app-kernel', [
             }
 
             data.route = route;
-
-            var controller = this._getController(route);
-            if (controller) {
-                this._processController(controller, data);
-                return;
-            }
-
-            this._processPage(route.id, data);
+            return data;
         },
 
         /**
@@ -136,7 +147,7 @@ modules.define('app-kernel', [
                 logger.info('Error process page', data.request.url, data.request.method, e);
             } else {
                 this._processPage(this.params.page500, data);
-                logger.error('Error process page', data.request.url, data.request.method, e);
+                logger.error('Error process page', data.request.url, data.request.method, e.stack ? e.stack : e);
             }
         },
 
@@ -151,15 +162,16 @@ modules.define('app-kernel', [
 
             if (!Page) {
                 var errorMessage = 'Page "' + page + '" not found';
-                logger.error(errorMessage);
+                logger.error(errorMessage, data.request.url);
                 throw new Error(errorMessage);
             }
 
             logger.info('Start process page', page);
-            var promise = BEMTREE.apply(this._getBEMJSON(Page, data)).then(function (bemjson) {
-                this._writeResponse(BEMHTML.apply(bemjson), data, Page);
-                return data;
-            }, this);
+            var promise = BEMTREE.apply(this._getBEMJSON(Page, data), data.apiRequester)
+                .then(function (bemjson) {
+                    this._writeResponse(BEMHTML.apply(bemjson), data, Page);
+                    return data;
+                }, this);
             return this._postProcessPage(promise, data);
         },
 
@@ -176,24 +188,6 @@ modules.define('app-kernel', [
                 data.error = e;
                 return this._onPageProcessError(data);
             }, this);
-        },
-
-        /**
-         * @param {Route} route
-         * @returns {boolean}
-         * @protected
-         */
-        _getController: function (route) {
-            return false;
-        },
-
-        /**
-         * @param {IController} controller
-         * @param {RequestData} data
-         * @protected
-         */
-        _processController: function (controller, data) {
-
         },
 
         /**

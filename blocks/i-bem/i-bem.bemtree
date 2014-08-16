@@ -1,0 +1,87 @@
+/* global oninit, Vow */
+oninit(function (exports, context) {
+    var undef,
+        isFunction = function (obj) {
+            return typeof obj === 'function';
+        };
+
+    function BEMContext (ctx, apply, apiRequester) {
+        context.BEMContext.call(this, ctx, apply);
+        this._apiRequester = apiRequester;
+    }
+
+    BEMContext.prototype = Object.create(context.BEMContext.prototype);
+
+    BEMContext.prototype.get = function (route, routeParams, onFulfilled, onRejected) {
+        if (routeParams && isFunction(routeParams)) {
+            onRejected = onFulfilled;
+            onFulfilled = routeParams;
+            routeParams = undef;
+        }
+        return this.doAsync(this._apiRequester.get(route, routeParams), onFulfilled, onRejected, this);
+    };
+
+    /**
+     * @param {Function|Promise} fn
+     * @param {Function} [onFulfilled]
+     * @param {Function} [onRejected]
+     * @param {Object} [context]
+     * @returns {vow:Promise}
+     */
+    BEMContext.prototype.doAsync = function doAsync(fn, onFulfilled, onRejected, context) {
+        if (onFulfilled && !isFunction(onFulfilled)) {
+            context = onFulfilled;
+            onFulfilled = undef;
+        } else if (onRejected && !isFunction(onRejected)) {
+            context = onRejected;
+            onRejected = undef;
+        }
+        context = context || this;
+
+        var mode = this._mode,
+            ctx = this.ctx,
+            block = this.block,
+            elem = this.elem,
+            mods = this.mods,
+            elemMods = this.elemMods,
+            restore = function (response) {
+                this._mode = mode;
+                this.ctx = ctx;
+                this.block = block;
+                this.elem = elem;
+                this.mods = mods;
+                this.elemMods = elemMods;
+                return response;
+            }.bind(this),
+            promise = isFunction(fn) ? Vow.invoke(fn, context) : fn;
+
+        if(onFulfilled) {
+            if(onRejected) {
+                promise = promise.then(function (response) {
+                    restore();
+                    return onFulfilled.call(this, response);
+                }, function (response) {
+                    restore();
+                    return onRejected.call(this, response);
+                }, context);
+            } else {
+                promise = promise.then(restore).then(onFulfilled, context);
+            }
+        }
+
+        this.__queue.push(promise);
+
+        return promise.always(restore);
+    };
+
+    var oldApply = context.xjstApply;
+    exports.apply = BEMContext.applyAsync = function BEMContext_applyAsync (context, apiRequester) {
+        var ctx = new BEMContext(context || this, oldApply, apiRequester);
+        ctx._buf = ctx.apply();
+        return Vow
+            .all(ctx.__queue)
+            .then(function () {
+                return ctx._buf;
+            });
+    };
+});

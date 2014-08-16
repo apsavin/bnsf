@@ -1,0 +1,3 @@
+oninit(function (exports, context) {
+    context.xjstApply = exports.apply;
+});

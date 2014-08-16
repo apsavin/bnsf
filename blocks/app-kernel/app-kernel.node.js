@@ -1,5 +1,7 @@
 /**@module app-kernel*/
-modules.define('app-kernel', ['i-bem', 'controllers'], function (provide, BEM, controllers, appDecl) {
+modules.define('app-kernel', [
+    'i-bem', 'controllers', 'app-api-router', 'api-requester', 'objects',
+], function (provide, BEM, controllers, router, ApiRequester, objects, appDecl) {
     "use strict";
 
     /**
@@ -31,10 +33,10 @@ modules.define('app-kernel', ['i-bem', 'controllers'], function (provide, BEM, c
          * @returns {{requestListenerPort: number}}
          */
         getDefaultParams: function () {
-            return {
+            return objects.extend({
                 requestListenerPort: 3000,
                 staticHost: 'localhost:8080'
-            };
+            }, this.__base());
         },
 
         /**
@@ -68,6 +70,34 @@ modules.define('app-kernel', ['i-bem', 'controllers'], function (provide, BEM, c
                 }, {});
                 callback.call(this);
             }.bind(this));
+        },
+
+        /**
+         * @param {RequestData} data
+         * @returns {NodeRequestData}
+         * @protected
+         */
+        _fillRequestData: function (data) {
+            data = this.__base(data);
+            data.apiRequester = new ApiRequester(null, {
+                router: router,
+                cookieStorage: data.request.session
+            });
+            return data;
+        },
+
+        /**
+         * @param {NodeRequestData} data
+         * @protected
+         */
+        _processRequest: function (data) {
+            var route = data.route,
+                controller = this._getController(route);
+            if (controller) {
+                this._processController(controller, data);
+                return;
+            }
+            this.__base(data);
         },
 
         /**
@@ -129,10 +159,11 @@ modules.define('app-kernel', ['i-bem', 'controllers'], function (provide, BEM, c
 
         /**
          * @param {Route} route
+         * @returns {?IController}
          * @protected
          */
         _getController: function (route) {
-            return this._controllers[route.id] || false;
+            return this._controllers[route.id];
         },
 
         /**
