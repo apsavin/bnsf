@@ -50,9 +50,19 @@ modules.define('api-requester', [
                 body: typeof body === 'object' ? JSON.stringify(body) : body,
                 jar: jar
             }, function (err, res, body) {
+                var parsedBody;
+
+                try {
+                    parsedBody = _this._processBody(res, body);
+                } catch (e) {
+                    logger.error('Server response on ' + method.toUpperCase() +  ' ' + url + ' can not be parsed');
+                    deferred.reject(e);
+                    return deferred.promise();
+                }
+
                 var output = {
                     error: err ? err.message : '',
-                    body: _this._processBody(res, body)
+                    body: parsedBody
                 };
                 if (res) {
                     cookieStorage.cookies[cookieId] = jar.getCookieString(url);
@@ -95,6 +105,7 @@ modules.define('api-requester', [
          * @param {OutgoingMessage} res
          * @param {String} body
          * @returns {String|Object}
+         * @throws {Error} if JSON is malformed
          * @private
          */
         _processBody: function (res, body) {
