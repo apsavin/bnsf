@@ -86,6 +86,15 @@ modules.define('app-kernel', [
             BEMDOM.replace(this._currentPage.domElem, html);
             this._cacheCurrentPage(Page.getName());
             document.title = Page.getTitle();
+        },
+
+        /**
+         * @param {String} url
+         * @param {RequestData} data
+         * @protected
+         */
+        _redirect: function (url, data) {
+            window.location = url;
         }
     }));
 });

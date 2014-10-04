@@ -1,12 +1,12 @@
 /**@module app-kernel*/
 modules.define('app-kernel', [
-    'request-listener', 'app-router-base', 'BEMTREE', 'BEMHTML', 'pages', 'app-logger', 'vow'
-], function (provide, RequestListener, appRouterBase, BEMTREE, BEMHTML, pages, logger, Vow) {
+    'request-listener', 'app-router-base', 'BEMTREE', 'BEMHTML', 'pages', 'app-logger'
+], function (provide, RequestListener, appRouterBase, BEMTREE, BEMHTML, pages, logger) {
     "use strict";
 
     /**
      * @typedef {Object} RequestData
-     * @property {{url: String, method: String}} request
+     * @property {{url: String, method: String, headers: {host: String}} request
      * @property {Route} route
      * @property {ApiRequester} apiRequester
      * @property {{error: String, handled: ?Boolean, response: [{statusCode: Number, statusText: String}]}} error
@@ -143,12 +143,41 @@ modules.define('app-kernel', [
             }
             e.handled = true;
             if (e.response && e.response.statusCode === 404) {
-                this._processPage(this.params.page404, data);
-                logger.info('Error process page', data.request.url, data.request.method, e);
+                this._handlePage404Error(data);
+            } else if (e.redirect) {
+                this._redirect(e.path, data);
             } else {
-                this._processPage(this.params.page500, data);
-                logger.error('Error process page', data.request.url, data.request.method, e.stack ? e.stack : e);
+                this._handlePageError(data);
             }
+        },
+
+        /**
+         * @param {String} pageName
+         * @param {RequestData} data
+         * @param {String} level 'error' or 'info'
+         * @private
+         */
+        _redirectWithError: function (pageName, data, level) {
+            var e = data.error,
+                request = data.request;
+            this._processPage(pageName, data);
+            logger[level]('Error process page', request.url, request.method, level === 'error' && e.stack ? e.stack : e);
+        },
+
+        /**
+         * @param {RequestData} data
+         * @protected
+         */
+        _handlePage404Error: function (data) {
+            this._redirectWithError(this.params.page404, data, 'info');
+        },
+
+        /**
+         * @param {RequestData} data
+         * @protected
+         */
+        _handlePageError: function (data) {
+            this._redirectWithError(this.params.page500, data, 'error');
         },
 
         /**
@@ -198,6 +227,14 @@ modules.define('app-kernel', [
          */
         _writeResponse: function (html, data, Page) {
 
+        },
+
+        /**
+         * @param {String} url
+         * @param {RequestData} data
+         * @protected
+         */
+        _redirect: function (url, data) {
         },
 
         /**

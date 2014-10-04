@@ -97,7 +97,7 @@ modules.define('api-requester', [
                 'Accept': 'application/json',
                 'Content-type': 'application/json',
                 'Accept-Encoding': 'gzip, deflate',
-                'Connection': 'keep-alive'
+                'Connection': 'keep-alve'
             };
         },
 

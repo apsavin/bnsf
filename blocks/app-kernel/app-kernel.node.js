@@ -122,6 +122,19 @@ modules.define('app-kernel', [
         },
 
         /**
+         * @param {String} url
+         * @param {NodeRequestData} data
+         * @protected
+         */
+        _redirect: function (url, data) {
+            var response = data.response;
+            response.writeHead(302, {
+                'Location': url
+            });
+            response.end();
+        },
+
+        /**
          * @param {Function} Page
          * @param {NodeRequestData} data
          * @returns {Object}

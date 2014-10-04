@@ -21,7 +21,10 @@ modules.define('request-listener', ['jquery', 'app-navigation'], function (provi
                     _this._handleRequest({
                         request: {
                             url: this.pathname + this.search,
-                            method: 'GET'
+                            method: 'GET',
+                            headers: {
+                                host: location.host
+                            }
                         }
                     });
                 }

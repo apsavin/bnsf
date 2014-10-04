@@ -1,4 +1,20 @@
-/* global oninit, Vow */
+/* global oninit, Vow, router */
+/**
+ * @see .bem/techs/bemtree.js
+ * @returns {String} path
+ */
+var path = router.generate.bind(router),
+    /**
+     * @param {string} path
+     * @throws Error
+     */
+    redirect = function (path) {
+        var error = new Error("Redirect needed");
+        error.path = path;
+        error.redirect = true;
+        throw error;
+    };
+
 oninit(function (exports, context) {
     var undef,
         isFunction = function (obj) {
@@ -28,7 +44,7 @@ oninit(function (exports, context) {
      * @param {Object} [context]
      * @returns {vow:Promise}
      */
-    BEMContext.prototype.doAsync = function doAsync(fn, onFulfilled, onRejected, context) {
+    BEMContext.prototype.doAsync = function doAsync (fn, onFulfilled, onRejected, context) {
         if (onFulfilled && !isFunction(onFulfilled)) {
             context = onFulfilled;
             onFulfilled = undef;
@@ -55,8 +71,8 @@ oninit(function (exports, context) {
             }.bind(this),
             promise = isFunction(fn) ? Vow.invoke(fn, context) : fn;
 
-        if(onFulfilled) {
-            if(onRejected) {
+        if (onFulfilled) {
+            if (onRejected) {
                 promise = promise.then(function (response) {
                     restore();
                     return onFulfilled.call(this, response);

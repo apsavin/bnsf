@@ -22,8 +22,7 @@ exports.techMixin = {
 
         return '(function(g) {\n' +
             "  modules.define('" + exportName + "', ['vow', 'app-router-base'], function(provide, Vow, router) { \n" +
-            '  var path = router.generate.bind(router),\n' +
-            '      __bem_xjst = (function(exports) {\n' +
+            '  var __bem_xjst = (function(exports) {\n' +
             '     ' + code + ';\n' +
             '     return exports;\n' +
             '  })({});\n' +
