@@ -1,0 +1,5 @@
+block('page-403').content()([
+    {
+        content: '403 Access Denied'
+    }
+]);

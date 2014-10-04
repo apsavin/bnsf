@@ -21,6 +21,7 @@ modules.define('app-kernel', [
         getDefaultParams: function () {
             return {
                 page404: 'page-404',
+                page403: 'page-403',
                 page500: 'page-500'
             };
         },
@@ -142,8 +143,11 @@ modules.define('app-kernel', [
                 throw new Error(data);
             }
             e.handled = true;
-            if (e.response && e.response.statusCode === 404) {
+            var statusCode = e.response ? e.response.statusCode : undefined;
+            if (statusCode === 404) {
                 this._handlePage404Error(data);
+            } else if (statusCode === 403) {
+                this._handlePage403Error(data);
             } else if (e.redirect) {
                 this._redirect(e.path, data);
             } else {
@@ -170,6 +174,14 @@ modules.define('app-kernel', [
          */
         _handlePage404Error: function (data) {
             this._redirectWithError(this.params.page404, data, 'info');
+        },
+
+        /**
+         * @param {RequestData} data
+         * @protected
+         */
+        _handlePage403Error: function (data) {
+            this._redirectWithError(this.params.page403, data, 'info');
         },
 
         /**

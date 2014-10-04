@@ -4,7 +4,7 @@
     ],
     shouldDeps: [
         'app-router-base', 'i-page', 'request-listener', 'app-api-requester', 'app-navigation',
-        'page', 'page-404', 'page-500', {block: 'app-kernel', mods: {'init-auto': true}}, 'app-logger',
+        'page', 'page-404', 'page-403', 'page-500', {block: 'app-kernel', mods: {'init-auto': true}}, 'app-logger',
         'app-api-router', 'api-requester', 'objects'
     ]
 })
