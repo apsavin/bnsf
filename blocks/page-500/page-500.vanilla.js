@@ -5,8 +5,6 @@ modules.define('page-500', ['i-page'], function (provide, Page) {
 
     }, {
 
-        _route: this.name,
-
         _title: 'Server error 500'
 
     }));

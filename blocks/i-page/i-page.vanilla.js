@@ -12,7 +12,7 @@ modules.define('i-page', function (provide) {
             _route: '',
 
             getRoute: function () {
-                return this._route;
+                return this._route || this.getName();
             },
 
             _title: '',

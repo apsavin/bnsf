@@ -5,8 +5,6 @@ modules.define('page-404', ['i-page'], function (provide, Page) {
 
     }, {
 
-        _route: this.name,
-
         _title: '404 not found'
 
     }));
