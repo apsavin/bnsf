@@ -116,9 +116,10 @@ exports.techMixin = {
     },
 
     _concatTemplates: function (res, output) {
-        var templates = ['bemhtml', 'bemtree'].map(function (techName) {
-            return this.getBuildResultChunk(output + '.' + techName + '.js');
-        }, this);
+        var outputDir = PATH.resolve(output, '..'),
+            templates = ['bemhtml', 'bemtree'].map(function (techName) {
+                return this.getBuildResultChunk(PATH.relative(outputDir, output + '.' + techName + '.js'));
+            }, this);
 
         this._concat(res, templates.join('\n'));
     },
