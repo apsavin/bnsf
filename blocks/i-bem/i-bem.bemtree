@@ -1,20 +1,4 @@
-/* global oninit, Vow, router */
-/**
- * @see .bem/techs/bemtree.js
- * @returns {String} path
- */
-var path = router.generate.bind(router),
-    /**
-     * @param {string} path
-     * @throws Error
-     */
-    redirect = function (path) {
-        var error = new Error("Redirect needed");
-        error.path = path;
-        error.redirect = true;
-        throw error;
-    };
-
+/* global oninit, Vow */
 oninit(function (exports, context) {
     var undef,
         isFunction = function (obj) {

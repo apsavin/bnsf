@@ -22,6 +22,11 @@ exports.techMixin = {
 
         return '(function(g) {\n' +
             "  modules.define('" + exportName + "', ['vow', 'app-router-base'], function(provide, Vow, router) { \n" +
+            '  var path = router.generate.bind(router),\n'+
+            '      redirect = function (path) {\n'+
+            '          var error = new Error("Redirect needed");error.path = path;error.redirect = true;\n'+
+            '          throw error;\n'+
+            '      };\n'+
             '  var __bem_xjst = (function(exports) {\n' +
             '     ' + code + ';\n' +
             '     return exports;\n' +
