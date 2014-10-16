@@ -33,7 +33,9 @@ modules.define('api-requester', [
                      * @type {Object.<Function>}
                      * @private
                      */
-                    this._sendDebouncedRequest = {};
+                    this._sendDebouncedRequests = {};
+
+                    this._onXhrComplete = this._onXhrComplete.bind(this);
 
                     /**
                      * @type {String}
@@ -43,7 +45,7 @@ modules.define('api-requester', [
 
                     ['get', 'post', 'put', 'patch', 'delete'].forEach(function (method) {
                         this._requests[method] = [];
-                        this._sendDebouncedRequest[method] = debounce(this._sendRequest.bind(this, method));
+                        this._sendDebouncedRequests[method] = debounce(this._sendRequests.bind(this, method));
                     }, this);
                 }
             }
@@ -52,12 +54,15 @@ modules.define('api-requester', [
         /**
          * @param {String} method
          * @param {String} route
-         * @param {Object} [routeParameters]
+         * @param {?Object} [routeParameters]
          * @param {String|Object} [body]
          * @returns {vow:Promise}
          */
         sendRequest: function (method, route, routeParameters, body) {
             method = method.toLowerCase();
+            if (body && !$.isPlainObject(body) && typeof body !== 'string') {
+                return this._sendRequest(method, route, routeParameters, body);
+            }
             var deferred = Vow.defer();
             this._requests[method].push({
                 data: {
@@ -67,7 +72,7 @@ modules.define('api-requester', [
                 },
                 deferred: deferred
             });
-            this._sendDebouncedRequest[method]();
+            this._sendDebouncedRequests[method]();
             return deferred.promise();
         },
 
@@ -95,28 +100,72 @@ modules.define('api-requester', [
          * @returns {string}
          * @private
          */
-        _prepareUrl: function (method, requests) {
-            var data = {
-                r: requests.map(function (request) {
+        _prepareUrls: function (method, requests) {
+            var routes = requests.map(function (request) {
                     return request.data.route;
                 }),
-                rP: requests.map(function (request) {
+                routesParameters = requests.map(function (request) {
                     return JSON.stringify(request.data.routeParameters || null);
-                })
-            };
-            return this._apiPath + '?' + $.param(data);
+                });
+            return this._prepareUrl(routes, routesParameters);
+        },
+
+        /**
+         * @param {String|Array.<String>} route
+         * @param {String|Array.<String>} routeParameters
+         * @returns {string}
+         * @private
+         */
+        _prepareUrl: function (route, routeParameters) {
+            return this._apiPath + '?' + $.param({
+                r: route,
+                rP: routeParameters
+            });
+        },
+
+        /**
+         * @param {String} method
+         * @param {String} route
+         * @param {?Object} routeParameters
+         * @param {FormData} body
+         * @returns {vow:Promise}
+         * @private
+         */
+        _sendRequest: function (method, route, routeParameters, body) {
+            var deferred = Vow.defer();
+            this._activeXhrs.push($.ajax({
+                url: this._prepareUrl(route, JSON.stringify(routeParameters)),
+                type: method,
+                data: body,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.error) {
+                        deferred.reject(response);
+                    } else {
+                        deferred.resolve(response);
+                    }
+                },
+                error: function (xhr, statusText, error) {
+                    deferred.reject({
+                        error: error,
+                        response: xhr
+                    });
+                },
+                complete: this._onXhrComplete
+            }));
+            return deferred.promise();
         },
 
         /**
          * @param {String} method
          * @private
          */
-        _sendRequest: function (method) {
-            var requests = this._requests[method],
-                activeXhrs = this._activeXhrs;
+        _sendRequests: function (method) {
+            var requests = this._requests[method];
             this._requests[method] = [];
-            activeXhrs.push($.ajax({
-                url: this._prepareUrl(method, requests),
+            this._activeXhrs.push($.ajax({
+                url: this._prepareUrls(method, requests),
                 type: method,
                 dataType: 'json',
                 data: this._prepareData(method, requests),
@@ -147,12 +196,18 @@ modules.define('api-requester', [
                         });
                     });
                 },
-                complete: function (xhr) {
-                    activeXhrs = activeXhrs.filter(function (activeXhr) {
-                        return xhr !== activeXhr;
-                    });
-                }
+                complete: this._onXhrComplete
             }));
+        },
+
+        /**
+         * @param {XMLHttpRequest} xhr
+         * @private
+         */
+        _onXhrComplete: function (xhr) {
+            this._activeXhrs = this._activeXhrs.filter(function (activeXhr) {
+                return xhr !== activeXhr;
+            });
         },
 
         /**

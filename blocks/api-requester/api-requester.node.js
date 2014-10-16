@@ -6,6 +6,7 @@ modules.define('api-requester', [
 
     var request = require('request'),
         URL = require('url'),
+        Readable = require('stream').Readable,
         defaultCookieStorage = {};
 
     /**
@@ -24,8 +25,8 @@ modules.define('api-requester', [
         /**
          * @param {String} method
          * @param {String} [route]
-         * @param {Object} [routeParameters]
-         * @param {String|Object} [body]
+         * @param {?Object} [routeParameters]
+         * @param {String|Object|Readable} [body]
          * @returns {vow:Promise}
          */
         sendRequest: function (method, route, routeParameters, body) {
@@ -43,19 +44,13 @@ modules.define('api-requester', [
                 jar.setCookie(cookieStorage.cookies[cookieId], url);
             }
 
-            request({
-                url: url,
-                method: method,
-                headers: this._getRequestHeaders(route),
-                body: typeof body === 'object' ? JSON.stringify(body) : body,
-                jar: jar
-            }, function (err, res, body) {
+            var requestCallback = function (err, res, body) {
                 var parsedBody;
 
                 try {
                     parsedBody = _this._processBody(res, body);
                 } catch (e) {
-                    logger.error('Server response on ' + method.toUpperCase() +  ' ' + url + ' can not be parsed');
+                    logger.error('Server response on ' + method.toUpperCase() + ' ' + url + ' can not be parsed');
                     deferred.reject(e);
                     return deferred.promise();
                 }
@@ -83,7 +78,24 @@ modules.define('api-requester', [
                 } else {
                     deferred.resolve(output);
                 }
-            });
+            };
+
+            if (body && body instanceof Readable) {
+                body.pipe(request({
+                    url: url,
+                    method: method,
+                    jar: jar
+                }, requestCallback));
+            } else {
+                var preparedBody = typeof body === 'object' ? JSON.stringify(body) : body;
+                request({
+                    url: url,
+                    method: method,
+                    headers: this._getRequestHeaders(route),
+                    body: preparedBody,
+                    jar: jar
+                }, requestCallback);
+            }
             return deferred.promise();
         },
 
@@ -95,9 +107,9 @@ modules.define('api-requester', [
         _getRequestHeaders: function (route) {
             return {
                 'Accept': 'application/json',
-                'Content-type': 'application/json',
+                'Content-Type': 'application/json',
                 'Accept-Encoding': 'gzip, deflate',
-                'Connection': 'keep-alve'
+                'Connection': 'keep-alive'
             };
         },
 

@@ -15,18 +15,26 @@ modules.define('controller-api', [
          */
         processRequest: function (data) {
             var method = data.request.method,
-                routeParameters = data.route.parameters,
+                requestParameters = data.route.parameters,
                 bodies = (data.request.body ? data.request.body.bodies : []) || [],
-                routes = routeParameters['r[]'],
-                routesParameters = routeParameters['rP[]'] || [],
+                routes = requestParameters['r[]'],
+                routesParameters = requestParameters['rP[]'] || [],
+                route = requestParameters['r'],
+                routeParameters = requestParameters['rP'],
                 response = data.response,
                 apiRequester = data.apiRequester;
 
             if (!routes) {
-                this._sendJSON(response, {
-                    error: 'no requests'
-                });
-                return;
+                if (!route) {
+                    this._sendJSON(response, {
+                        error: 'no requests'
+                    });
+                    return;
+                } else {
+                    routes = route;
+                    routesParameters = routeParameters;
+                    bodies = [data.request];
+                }
             }
 
             routes = Array.isArray(routes) ? routes : [routes];
