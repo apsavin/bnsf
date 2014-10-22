@@ -1,7 +1,7 @@
 /**@module app-kernel*/
 modules.define('app-kernel', [
-    'i-bem', 'controllers', 'app-api-router', 'api-requester', 'objects',
-], function (provide, BEM, controllers, router, ApiRequester, objects, appDecl) {
+    'i-bem', 'controllers', 'app-api-router', 'api-requester', 'objects', 'app-kernel__config'
+], function (provide, BEM, controllers, router, ApiRequester, objects, config, appDecl) {
     "use strict";
 
     /**
@@ -34,8 +34,8 @@ modules.define('app-kernel', [
          */
         getDefaultParams: function () {
             return objects.extend({
-                requestListenerPort: 3000,
-                staticHost: 'localhost:8080'
+                requestListenerPort: config.port,
+                staticHost: config.staticHost
             }, this.__base());
         },
 

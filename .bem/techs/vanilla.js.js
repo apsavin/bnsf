@@ -206,17 +206,30 @@ exports.techMixin = {
      * @protected
      */
     _getRoutes: function (output, suffix, moduleName) {
+        return this._readYmlFileAndReplacePlaceholders(output, suffix, function (content) {
+            return this._getJSONModuleDefinition(moduleName, content);
+        });
+    },
+
+    /**
+     * @param {string} output
+     * @param {string} suffix
+     * @param {Function} contentWrapper
+     * @returns {Promise}
+     * @protected
+     */
+    _readYmlFileAndReplacePlaceholders: function (output, suffix, contentWrapper) {
         var path = output + suffix;
         return Vow.all([this._getConfig(output), this._readFile(path)])
-            .spread(function (config, routing) {
+            .spread(function (config, content) {
                 for (var key in config) {
                     if (config.hasOwnProperty(key)) {
-                        routing = routing.replace(new RegExp('%' + key + '%', 'g'), config[key]);
+                        content = content.replace(new RegExp('%' + key + '%', 'g'), config[key]);
                     }
                 }
                 return {
                     path: path.replace('yml', 'js'),
-                    content: this._getJSONModuleDefinition(moduleName, yml.safeLoad(routing))
+                    content: contentWrapper.call(this, yml.safeLoad(content))
                 };
             }, this);
     },
