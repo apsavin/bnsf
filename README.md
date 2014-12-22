@@ -1,8 +1,8 @@
 # bnsf - bem node single page application framework
 
-Work in progress
+For FAQs and HOWTOs see [wiki](https://github.com/apsavin/bnsf/wiki).
 
-For usage example see [bnsf-project-stub](https://github.com/apsavin/bnsf-project-stub)
+For usage example see [bnsf-project-stub](https://github.com/apsavin/bnsf-project-stub).
 
 # Why bnsf?
 
