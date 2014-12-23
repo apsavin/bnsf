@@ -4,6 +4,8 @@ For FAQs and HOWTOs see [wiki](https://github.com/apsavin/bnsf/wiki).
 
 For usage example see [bnsf-project-stub](https://github.com/apsavin/bnsf-project-stub).
 
+For more interesting usage example see [try-bem-online.net](http://try-bem-online.net), source code [here](https://github.com/apsavin/try-bem-online__front).
+
 # Why bnsf?
 
 - Shared routing and templates between browser and server
