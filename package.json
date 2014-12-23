@@ -1,7 +1,7 @@
 {
   "author": "Alexander Savin",
   "name": "bnsf",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "repository": {
     "type": "git",
     "url": "https://github.com/apsavin/bnsf.git"
@@ -16,7 +16,7 @@
     "express-session": "^1.6.5",
     "js-yaml": "~3.0.2",
     "lodash.defaults": "2.4.1",
-    "request": "~2.36.0",
+    "request": "~2.51.0",
     "router-base": "0.1.0",
     "tough-cookie": "^0.12.1",
     "vow": "~0.4.3"

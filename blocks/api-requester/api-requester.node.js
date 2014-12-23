@@ -93,6 +93,7 @@ modules.define('api-requester', [
                     method: method,
                     headers: this._getRequestHeaders(route),
                     body: preparedBody,
+                    gzip: true,
                     jar: jar
                 }, requestCallback);
             }
@@ -108,7 +109,6 @@ modules.define('api-requester', [
             return {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
-                'Accept-Encoding': 'gzip, deflate',
                 'Connection': 'keep-alive'
             };
         },
