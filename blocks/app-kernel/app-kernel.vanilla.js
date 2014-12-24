@@ -1,7 +1,7 @@
 /**@module app-kernel*/
 modules.define('app-kernel', [
-    'request-listener', 'app-router-base', 'BEMTREE', 'BEMHTML', 'pages', 'app-logger'
-], function (provide, RequestListener, appRouterBase, BEMTREE, BEMHTML, pages, logger) {
+    'request-listener', 'app-router-base', 'BEMTREE', 'BEMHTML', 'pages', 'app-logger', 'vow'
+], function (provide, RequestListener, appRouterBase, BEMTREE, BEMHTML, pages, logger, Vow) {
     "use strict";
 
     /**
@@ -204,15 +204,29 @@ modules.define('app-kernel', [
             if (!Page) {
                 var errorMessage = 'Page "' + page + '" not found';
                 logger.error(errorMessage, data.request.url);
-                throw new Error(errorMessage);
+                logger.error('Is "' + page + '" in the bemdecl.js file?');
+                data.error = new Error(errorMessage);
+                if (this._pages[this.params.page404]) {
+                    this._handlePage404Error(data);
+                } else if (this._pages[this.params.page500]) {
+                    this._handlePageError(data);
+                } else {
+                    throw data.error;
+                }
+                return;
             }
 
             logger.info('Start process page', page);
-            var promise = BEMTREE.apply(this._getBEMJSON(Page, data), data.apiRequester)
-                .then(function (bemjson) {
-                    this._writeResponse(BEMHTML.apply(bemjson), data, Page);
-                    return data;
-                }, this);
+            var promise;
+            try {
+                promise = BEMTREE.apply(this._getBEMJSON(Page, data), data.apiRequester)
+                    .then(function (bemjson) {
+                        this._writeResponse(BEMHTML.apply(bemjson), data, Page);
+                        return data;
+                    }, this);
+            } catch (e) {
+                promise = Vow.reject(e);
+            }
             return this._postProcessPage(promise, data);
         },
 
