@@ -9,7 +9,7 @@ For more interesting usage example see [try-bem-online.net](http://try-bem-onlin
 # Why bnsf?
 
 - Shared routing and templates between browser and server
-- Single page application with easy
+- Single page application easily
 - SEO-friendly
 - Connect middleware compatible
 - JavaScript all the way
@@ -20,7 +20,7 @@ For more interesting usage example see [try-bem-online.net](http://try-bem-onlin
   - Asynchronous JS module system (no global variables)
   - Semantic blocks for application building
   - Build process out of the box (including CSS and JS minification)
-  - Unit tests with easy (including tools for CSS/templates testing)
+  - Unit tests easily (including tools for CSS/templates testing)
 
 
 ## Shared routing and templates between browser and server
@@ -52,7 +52,7 @@ and in client or server JavaScript code:
 router.generate('main-page'); // returns "/"
 ```
 
-## Single page application with easy
+## Single page application easily
 
 Write your code once, use everywhere. Templates, routing and your JavaScript code are shared between the client side and server side, but it's smart sharing: you always can specify, which code should be only on client, which code should be only on server and which should run on both sides of your application. The same with routes.
 Applications, written on top of bnsf, are views only. You will need to write some part with http API separately, using any language: it can be another node.js server, PHP application or even Go server. Such architecture gives you all pros of separation View from Data. You can read more in awesome article from Nickolas Zackas [here](http://www.nczonline.net/blog/2013/10/07/node-js-and-the-new-web-front-end/), but I want to specify a pair of advantages in the document:
