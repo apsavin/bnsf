@@ -2,6 +2,8 @@
 
 For FAQs and HOWTOs see [wiki](https://github.com/apsavin/bnsf/wiki).
 
+There is an yeoman [generator](https://github.com/apsavin/generator-bnsf) for bnsf.
+
 For usage example see [bnsf-project-stub](https://github.com/apsavin/bnsf-project-stub).
 
 For more interesting usage example see [try-bem-online.net](http://try-bem-online.net), source code [here](https://github.com/apsavin/try-bem-online__front).
