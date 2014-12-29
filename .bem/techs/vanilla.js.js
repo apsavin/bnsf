@@ -207,6 +207,10 @@ exports.techMixin = {
      */
     _getRoutes: function (output, suffix, moduleName) {
         return this._readYmlFileAndReplacePlaceholders(output, suffix, function (content) {
+            if (!content) {
+                LOGGER.warn('There is no routes in %s%s', output, suffix);
+                content = [];
+            }
             return this._getJSONModuleDefinition(moduleName, content);
         });
     },
