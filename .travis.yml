@@ -8,7 +8,7 @@ branches:
     - master
 
 before_script:
-  - npm deps
+  - node ./node_modules/.bin/bower-npm-install --non-interactive
 
 script:
   - npm test
