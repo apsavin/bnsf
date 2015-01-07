@@ -28,6 +28,13 @@ vows.describe('bnsf-based-app')
                         '-r',
                         constants.TEST_APP_DIR
                     ]);
+                    bemServerProcess.on('error', function (err) {
+                        console.log(err);
+                        process.exit(1);
+                    });
+                    bemServerProcess.stderr.on('data', function (data) {
+                        console.log('bem server stderr' + data);
+                    });
                     bemServerProcess.stdout.on('data', function onData (data) {
                         data = data.toString();
                         console.log(data);
@@ -43,6 +50,13 @@ vows.describe('bnsf-based-app')
                     appServerProcess = spawn('node', [
                         constants.APP_SCRIPT
                     ]);
+                    appServerProcess.on('error', function (err) {
+                        console.log(err);
+                        process.exit(1);
+                    });
+                    appServerProcess.stderr.on('data', function (data) {
+                        console.log('app server stderr' + data);
+                    });
                     appServerProcess.stdout.on('data', function onData (data) {
                         data = data.toString();
                         console.log(data);
