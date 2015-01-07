@@ -31,6 +31,7 @@ vows.describe('bnsf-based-app')
                     bemServerProcess.stdout.on('data', function onData (data) {
                         if (/Server is listening/.test(data.toString())) {
                             bemServerProcess.stdout.removeListener('data', onData);
+                            console.log('bem server started');
                             if (phantomStarted && bnsfStarted && !callbackCalled) {
                                 _this.callback();
                             }
@@ -42,6 +43,7 @@ vows.describe('bnsf-based-app')
                     ]);
                     appServerProcess.stdout.on('data', function onData (data) {
                         if (/server started/.test(data.toString())) {
+                            console.log('app server started');
                             appServerProcess.stdout.removeListener('data', onData);
                             if (phantomStarted && bemStarted && !callbackCalled) {
                                 _this.callback();
@@ -54,6 +56,7 @@ vows.describe('bnsf-based-app')
                     phantom.instance = phantomInstance;
                     phantomInstance.createPage(function (page) {
                         phantom.page = page;
+                        console.log('phantom started');
                         if (bnsfStarted && bemStarted && !callbackCalled) {
                             _this.callback();
                         }
