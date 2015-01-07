@@ -22,6 +22,7 @@ vows.describe('bnsf-based-app')
                 bem.make({
                     root: constants.TEST_APP_DIR
                 }).then(function () {
+                    console.log('bem make finished successfully');
                     bemServerProcess = spawn('node', [
                         constants.BEM,
                         'server',
@@ -69,6 +70,9 @@ vows.describe('bnsf-based-app')
                             bnsfStarted = true;
                         }
                     });
+                }, function (err) {
+                    console.log(err);
+                    process.exit(1);
                 });
                 phantom.phantom.create(function (phantomInstance) {
                     phantom.instance = phantomInstance;
