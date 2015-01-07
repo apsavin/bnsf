@@ -1,5 +1,7 @@
 # bnsf - bem node single page application framework
 
+[![Build Status](https://travis-ci.org/apsavin/bnsf.svg?branch=master)](https://travis-ci.org/apsavin/bnsf) [![Bower version](https://badge.fury.io/bo/bnsf.svg)](http://badge.fury.io/bo/bnsf)
+
 For FAQs and HOWTOs see [wiki](https://github.com/apsavin/bnsf/wiki).
 
 There is an yeoman [generator](https://github.com/apsavin/generator-bnsf) for bnsf.
