@@ -10,7 +10,7 @@ branches:
 before_script:
   - node ./node_modules/.bin/bower-npm-install --non-interactive
   - rm -rf ./test-app/libs/*
-  - cp -R libs/bem-core test-app/libs
+  - cp -R libs/bem-core/ test-app/libs/bem-core
   - mkdir test-app/libs/bnsf
   - cp -R .bem test-app/libs/bnsf && cp -R blocks test-app/libs/bnsf && cp -R dev.blocks test-app/libs/bnsf
   - cp -R pre-bem-core.blocks test-app/libs/bnsf && cp -R node_modules test-app/libs/bnsf && cp -R libs test-app/libs/bnsf
