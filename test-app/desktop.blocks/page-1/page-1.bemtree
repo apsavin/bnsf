@@ -1,27 +1,29 @@
-block('page-1').content()([
-    {
-        block: 'link',
-        url: path('page-2'),
-        content: 'another page'
-    },
-    {
-        block: 'link',
-        url: path('page-3'),
-        content: 'dynamic page'
-    },
-    {
-        block: 'link',
-        url: path('page-4'),
-        content: 'dynamic page with get params'
-    },
-    {
-        block: 'link',
-        url: path('page-4', { tech: 'css' }),
-        content: 'dynamic page with not-default get parameter'
-    },
-    {
-        block: 'link',
-        url: path('page-5'),
-        content: 'page with redirect'
-    }
-]);
+block('page-1').content()(function () {
+    return [
+        {
+            block: 'link',
+            url: path('page-2'),
+            content: 'another page'
+        },
+        {
+            block: 'link',
+            url: path('page-3'),
+            content: 'dynamic page'
+        },
+        {
+            block: 'link',
+            url: path('page-4'),
+            content: 'dynamic page with get params'
+        },
+        {
+            block: 'link',
+            url: path('page-4', { tech: 'css' }),
+            content: 'dynamic page with not-default get parameter'
+        },
+        {
+            block: 'link',
+            url: path('page-5'),
+            content: 'page with redirect'
+        }
+    ];
+});
