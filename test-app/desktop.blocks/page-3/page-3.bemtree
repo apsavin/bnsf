@@ -1,0 +1,16 @@
+block('page-3').content()(function () {
+    return this.get('some_api_route', function (output) {
+        return [
+            {
+                block: 'link',
+                url: path('page-1'),
+                content: 'main page'
+            },
+            {
+                block: 'code-presenter',
+                tag: 'pre',
+                content: output.body
+            }
+        ]
+    });
+});

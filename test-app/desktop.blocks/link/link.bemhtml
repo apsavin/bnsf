@@ -1,0 +1,30 @@
+block('link')(
+    tag()('a'),
+
+    attrs()(function () {
+        var ctx = this.ctx,
+            attrs = {},
+            tabIndex;
+
+        if (ctx.url) {
+            attrs.href = ctx.url;
+            tabIndex = ctx.tabIndex;
+        } else {
+            tabIndex = ctx.tabIndex || 0;
+        }
+
+        if (typeof tabIndex !== 'undefined') {
+            attrs.tabindex = tabIndex;
+        }
+
+        if (ctx.title) {
+            attrs.title = ctx.title;
+        }
+
+        if (ctx.target) {
+            attrs.target = ctx.target;
+        }
+
+        return attrs;
+    })
+);

@@ -1,0 +1,20 @@
+- id: api
+  path: /api
+
+- id: page-1
+  path: /
+
+- id: page-2
+  path: /another-page/file.{format}
+  method: GET
+  defaults: {format: json}
+  requirements: {format: json|html}
+
+- id: page-3
+  path: /dynamic-page
+
+- id: page-4
+  path: /dynamic-page-with-params
+
+- id: page-5
+  path: /page-with-redirect

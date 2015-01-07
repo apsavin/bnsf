@@ -1,0 +1,7 @@
+block('page-2').content()([
+    {
+        block: 'link',
+        url: path('page-1'),
+        content: 'main page'
+    }
+]);
