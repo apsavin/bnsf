@@ -14,6 +14,9 @@ before_script:
   - mkdir test-app/libs/bnsf
   - cp -R .bem test-app/libs/bnsf && cp -R blocks test-app/libs/bnsf && cp -R dev.blocks test-app/libs/bnsf
   - cp -R pre-bem-core.blocks test-app/libs/bnsf && cp -R node_modules test-app/libs/bnsf && cp -R libs test-app/libs/bnsf
+  - ls -la ./test-app/libs/
+  - ls -la ./test-app/libs/bem-core/
+  - ls -la ./test-app/libs/bnsf/
 
 script:
   - npm test
