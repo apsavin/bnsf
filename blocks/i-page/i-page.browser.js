@@ -12,6 +12,21 @@ modules.define('i-page', [
     var IPage = BEMDOM.decl(this.name, page.proto, page.static).decl(/**@lends IPage*/{
 
         /**
+         * if this method is defined then partial update is available
+         * @param {RequestData} data
+         * @returns {Promise}
+         * @method
+         * @example
+         * update: function (data) {
+         *      return this._replace('some-block', {
+         *          block: 'some-block',
+         *          param: data.route.parameters.param
+         *      });
+         * }
+         */
+        update: null,
+
+        /**
          * @param {String} blockName
          * @param {Object} BEMJSON
          * @param {ApiRequester} [apiRequester]
