@@ -7,7 +7,16 @@ oninit(function (exports, context) {
 
     function BEMContext (ctx, apply, apiRequester) {
         context.BEMContext.call(this, ctx, apply);
+        /**
+         * @private
+         */
         this._apiRequester = apiRequester;
+
+        /**
+         * cache for apiRequester#get return values
+         * @type {object.<Promise>}
+         */
+        this._promises = {};
     }
 
     BEMContext.prototype = Object.create(context.BEMContext.prototype);
@@ -18,7 +27,10 @@ oninit(function (exports, context) {
             onFulfilled = routeParams;
             routeParams = undef;
         }
-        return this.doAsync(this._apiRequester.get(route, routeParams), onFulfilled, onRejected, this);
+        var promiseKey = route + routeParams ? JSON.stringify(routeParams) : '',
+            promises = this._promises,
+            promise = promises[promiseKey] = promises[promiseKey] || this._apiRequester.get(route, routeParams);
+        return this.doAsync(promise, onFulfilled, onRejected, this);
     };
 
     /**
