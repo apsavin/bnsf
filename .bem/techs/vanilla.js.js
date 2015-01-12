@@ -38,7 +38,7 @@ exports.techMixin = {
                     return _this.getBuildResult(filteredFiles, destSuffix, output, opts)
                         .then(function (r) {
                             res[destSuffix] = r;
-                            return _this.saveLastUsedData(file, {buildFiles: filteredFiles});
+                            return _this.saveLastUsedData(file, { buildFiles: filteredFiles });
                         });
                 }
             });
@@ -113,9 +113,17 @@ exports.techMixin = {
         var pages = decls.filter(function (name) {
             return /^page-/.test(name);
         });
-        var suffix = 'pages';
+        var suffix = this._getPagesSuffix();
         this._concat(res, this._techToBuildResultChunk(output, suffix));
         return this._writeFile(output + '.' + suffix + '.js', this._getPagesData(pages));
+    },
+
+    /**
+     * @returns {string}
+     * @private
+     */
+    _getPagesSuffix: function () {
+        return 'pages';
     },
 
     /**
@@ -124,7 +132,35 @@ exports.techMixin = {
      * @protected
      */
     _getPagesData: function (pages) {
-        return this._getJSONModuleDefinition('pages', pages);
+        var shift = '    ';
+        return '(function (pages, modules) {\n' +
+            shift + this._getModuleDefinition('pages', 'pages') +
+            shift + 'pages.forEach(function (pageName) {\n' +
+            this._getPageData(shift + shift, shift) +
+            shift + '});\n' +
+            '})(' + JSON.stringify(pages) + ', modules);';
+    },
+
+    /**
+     * @param {string} initialShift
+     * @param {string} shift
+     * @returns {string}
+     * @protected
+     */
+    _getPageData: function (initialShift, shift) {
+        return initialShift + "modules.define(pageName, ['i-page'], function (provide, Page, prev) {\n" +
+            initialShift + shift + "provide(prev || Page.decl(this.name, {}));\n" +
+            initialShift + "});\n";
+    },
+
+    /**
+     * @param {string} name
+     * @param {string} data
+     * @returns {string}
+     * @protected
+     */
+    _getModuleDefinition: function (name, data) {
+        return "modules.define('" + name + "', function(provide){provide(" + data + ");});\n";
     },
 
     /**
@@ -134,7 +170,7 @@ exports.techMixin = {
      * @protected
      */
     _getJSONModuleDefinition: function (name, data) {
-        return "\nmodules.define('" + name + "', function(provide){provide(" + JSON.stringify(data) + ");});";
+        return this._getModuleDefinition(name, JSON.stringify(data));
     },
 
     /**
@@ -300,6 +336,6 @@ exports.techMixin = {
      * @returns {string[]}
      */
     getDependencies: function () {
-        return ['bemdecl.js', 'bemhtml', 'bemtree'];
+        return ['bemdecl.js', 'bemhtml.js', 'bemtree.js'];
     }
 };

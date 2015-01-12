@@ -1,3 +1,4 @@
 ({
-    mustDeps: ['i-page']
+    mustDeps: ['i-page'],
+    shouldDeps: [{elem: 'title'}]
 })

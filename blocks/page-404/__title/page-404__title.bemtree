@@ -1,0 +1,1 @@
+block('page-404').elem('title').content()('404 not found');

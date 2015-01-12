@@ -118,7 +118,7 @@ modules.define('app-kernel', [
 
             if (!route) {
                 logger.info('Route for request ', data.request.url, ' not found');
-                route = {id: this.params.page404};
+                route = { id: this.params.page404 };
             }
 
             data.route = route;
@@ -270,7 +270,20 @@ modules.define('app-kernel', [
          * @protected
          */
         _getBEMJSON: function (Page, data) {
-            return this._getPageContentBEMJSON(Page, data);
+            return this._getPageBEMJSON(Page, data);
+        },
+
+        /**
+         * @param {Function} Page
+         * @returns {object}
+         * @protected
+         */
+        _getTitleBEMJSON: function (Page) {
+            return {
+                block: Page.getName(),
+                elem: 'title',
+                tag: ''
+            };
         },
 
         /**

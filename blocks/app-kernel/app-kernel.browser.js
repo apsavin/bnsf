@@ -1,7 +1,7 @@
 /**@module app-kernel*/
 modules.define('app-kernel', [
-    'i-bem__dom', 'app-api-requester', 'app-navigation'
-], function (provide, BEMDOM, apiRequester, navigation, appKernelDecl) {
+    'i-bem__dom', 'app-api-requester', 'app-navigation', 'jquery'
+], function (provide, BEMDOM, apiRequester, navigation, $, appKernelDecl) {
     "use strict";
 
     /**
@@ -54,7 +54,7 @@ modules.define('app-kernel', [
 
         /**
          * @param {String} page
-         * @param {Object} data
+         * @param {RequestData} data
          * @returns {vow:Promise}
          * @protected
          */
@@ -69,7 +69,7 @@ modules.define('app-kernel', [
         },
 
         /**
-         * @param {Object} data
+         * @param {RequestData} data
          * @protected
          */
         _onPageProcessSuccess: function (data) {
@@ -78,14 +78,15 @@ modules.define('app-kernel', [
 
         /**
          * @param {String} html
-         * @param {Object} data
+         * @param {RequestData} data
          * @param {Function} Page
          * @protected
          */
         _writeResponse: function (html, data, Page) {
-            BEMDOM.replace(this._currentPage.domElem, html);
+            var $html = $(html);
+            BEMDOM.replace(this._currentPage.domElem, $html.filter(Page.buildSelector()));
             this._cacheCurrentPage(Page.getName());
-            document.title = Page.getTitle();
+            document.title = $html.filter('title').text();
         },
 
         /**
@@ -95,6 +96,20 @@ modules.define('app-kernel', [
          */
         _redirect: function (url, data) {
             window.location = url;
+        },
+
+        /**
+         * @param {Function} Page
+         * @param {RequestData} data
+         * @returns {Object}
+         * @protected
+         */
+        _getPageBEMJSON: function (Page, data) {
+            return {
+                block: 'page',
+                title: this._getTitleBEMJSON(Page),
+                content: this._getPageContentBEMJSON(Page, data)
+            };
         }
     }));
 });

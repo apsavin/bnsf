@@ -6,17 +6,16 @@ var PATH = require('path'),
 exports.baseTechPath = PATH.resolve(BEMCORE_TECHS, 'browser.js.js');
 
 exports.techMixin = {
-
     /**
-     * @param {Array.<String>} pages
-     * @returns {String}
+     * @param {string} initialShift
+     * @param {string} shift
+     * @returns {string}
      * @protected
      */
-    _getPagesData: function (pages) {
-        var data = this.__base(pages);
-        return data + pages.map(function (pageName) {
-            return "modules.define('i-bem__dom_init', ['" + pageName + "'], function(provide, _, prev) {provide(prev);});";
-        }).join('\n');
+    _getPageData: function (initialShift, shift) {
+        return this.__base(initialShift, shift) + initialShift + "modules.define('i-bem__dom_init', [pageName], function (provide, _, prev) {\n" +
+            initialShift + shift + "provide(prev);\n" +
+            initialShift + "});\n";
     },
 
     /**

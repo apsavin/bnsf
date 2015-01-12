@@ -1,0 +1,1 @@
+block('page-500').elem('title').content()('Server error 500');

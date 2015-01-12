@@ -90,6 +90,14 @@ exports.techMixin = {
     },
 
     /**
+     * @returns {string}
+     * @private
+     */
+    _getPagesSuffix: function () {
+        return this.__base() + '.node';
+    },
+
+    /**
      * @param {Object} res
      * @param {Array.<String>} decls
      * @param {String} output
@@ -118,6 +126,6 @@ exports.techMixin = {
      * @returns {Array.<String>}
      */
     getBuildSuffixes: function () {
-        return ['node.js', 'controllers.node.js', 'api.routing.js', 'config.node.js', 'routing.js', 'pages.js'];
+        return ['node.js', 'controllers.node.js', 'api.routing.js', 'config.node.js', 'routing.js', 'pages.node.js'];
     }
 };

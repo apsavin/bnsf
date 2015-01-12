@@ -9,16 +9,17 @@ modules.define('i-page', function (provide) {
     provide({
         proto: {},
         static: {
+
+            /**
+             * @protected
+             */
             _route: '',
 
+            /**
+             * @returns {string}
+             */
             getRoute: function () {
                 return this._route || this.getName();
-            },
-
-            _title: '',
-
-            getTitle: function () {
-                return this._title;
             }
         }
     });

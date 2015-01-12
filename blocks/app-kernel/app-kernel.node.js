@@ -140,20 +140,10 @@ modules.define('app-kernel', [
          * @returns {Object}
          * @protected
          */
-        _getBEMJSON: function (Page, data) {
-            return this._getPageBEMJSON(Page, data);
-        },
-
-        /**
-         * @param {Function} Page
-         * @param {NodeRequestData} data
-         * @returns {Object}
-         * @protected
-         */
         _getPageBEMJSON: function (Page, data) {
             return {
                 block: 'page',
-                title: Page.getTitle(),
+                title: this._getTitleBEMJSON(Page),
                 mix: {
                     block: 'app-kernel',
                     js: {

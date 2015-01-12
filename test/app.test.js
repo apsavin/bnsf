@@ -76,6 +76,7 @@ vows.describe('bnsf-based-app')
                 });
                 phantom.phantom.create(function (phantomInstance) {
                     phantom.instance = phantomInstance;
+                    console.log('phantom instance created');
                     phantomInstance.createPage(function (page) {
                         phantom.page = page;
                         console.log('phantom started');
