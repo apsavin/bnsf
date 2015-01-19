@@ -336,6 +336,6 @@ exports.techMixin = {
      * @returns {string[]}
      */
     getDependencies: function () {
-        return ['bemdecl.js', 'bemhtml.js', 'bemtree.js'];
+        return ['bemdecl.js', 'bemhtml', 'bemtree'];
     }
 };
