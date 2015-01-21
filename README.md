@@ -29,7 +29,7 @@ For more interesting usage example see [try-bem-online.net](http://try-bem-onlin
 
 ## Shared routing and templates between browser and server
 
-bnsf uses [router-base](https://github.com/apsavin/router-base/ internally). It's a router, [inspired](http://symfony.com/doc/current/cookbook/routing/scheme.html) by Symfony 2 routing system, written in JavaScript, so it can work both on client and on server (node.js). 
+bnsf uses [router-base](https://github.com/apsavin/router-base/) internally. It's a router, [inspired](http://symfony.com/doc/current/cookbook/routing/scheme.html) by Symfony 2 routing system, written in JavaScript, so it can work both on client and on server (node.js). 
 If you want to add a page to your application, you will need to specify a route for the page in YAML format:
 
 ```yaml
