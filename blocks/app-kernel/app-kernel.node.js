@@ -141,9 +141,7 @@ modules.define('app-kernel', [
          * @protected
          */
         _getPageBEMJSON: function (Page, data) {
-            return {
-                block: 'page',
-                title: this._getTitleBEMJSON(Page),
+            return objects.extend(this.__base(Page, data), {
                 mix: {
                     block: 'app-kernel',
                     js: {
@@ -151,13 +149,12 @@ modules.define('app-kernel', [
                     }
                 },
                 scripts: [
-                    {elem: 'js', url: '//' + this.params.staticHost + '/desktop.bundles/index/_index.js'}
+                    { elem: 'js', url: '//' + this.params.staticHost + '/desktop.bundles/index/_index.js' }
                 ],
                 styles: [
-                    {elem: 'css', url: '//' + this.params.staticHost + '/desktop.bundles/index/_index.css'}
-                ],
-                content: this._getPageContentBEMJSON(Page, data)
-            };
+                    { elem: 'css', url: '//' + this.params.staticHost + '/desktop.bundles/index/_index.css' }
+                ]
+            });
         },
 
         /**

@@ -219,7 +219,7 @@ modules.define('app-kernel', [
             logger.info('Start process page', page);
             var promise;
             try {
-                promise = BEMTREE.apply(this._getBEMJSON(Page, data), data.apiRequester)
+                promise = BEMTREE.apply(this._getBEMJSON(Page, data), data)
                     .then(function (bemjson) {
                         this._writeResponse(BEMHTML.apply(bemjson), data, Page);
                         return data;
@@ -275,6 +275,20 @@ modules.define('app-kernel', [
 
         /**
          * @param {Function} Page
+         * @param {RequestData} data
+         * @returns {Object}
+         * @protected
+         */
+        _getPageBEMJSON: function (Page, data) {
+            return {
+                block: 'page',
+                title: this._getTitleBEMJSON(Page),
+                content: this._getPageContentBEMJSON(Page, data)
+            };
+        },
+
+        /**
+         * @param {Function} Page
          * @returns {object}
          * @protected
          */
@@ -295,9 +309,7 @@ modules.define('app-kernel', [
         _getPageContentBEMJSON: function (Page, data) {
             return {
                 block: Page.getName(),
-                js: true,
-                request: data.request,
-                route: data.route
+                js: true
             };
         }
     });

@@ -96,20 +96,6 @@ modules.define('app-kernel', [
          */
         _redirect: function (url, data) {
             window.location = url;
-        },
-
-        /**
-         * @param {Function} Page
-         * @param {RequestData} data
-         * @returns {Object}
-         * @protected
-         */
-        _getPageBEMJSON: function (Page, data) {
-            return {
-                block: 'page',
-                title: this._getTitleBEMJSON(Page),
-                content: this._getPageContentBEMJSON(Page, data)
-            };
         }
     }));
 });

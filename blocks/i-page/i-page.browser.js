@@ -1,8 +1,16 @@
 /**@module i-page*/
 modules.define('i-page', [
-    'i-bem__dom', 'BEMHTML', 'BEMTREE', 'app-api-requester'
-], function (provide, BEMDOM, BEMHTML, BEMTREE, appApiRequester, page) {
+    'i-bem__dom', 'BEMHTML', 'BEMTREE'
+], function (provide, BEMDOM, BEMHTML, BEMTREE, page) {
     "use strict";
+
+    /**
+     * @param {BEM.DOM} block
+     * @this {string} html
+     */
+    var replaceBlock = function (block) {
+        IPage.replace(block.domElem, this);
+    };
 
     /**
      * @class IPage
@@ -28,18 +36,16 @@ modules.define('i-page', [
 
         /**
          * @param {String} blockName
-         * @param {Object} BEMJSON
-         * @param {ApiRequester} [apiRequester]
-         * @returns {vow:Promise}
+         * @param {RequestData} data
+         * @returns {Promise}
          * @protected
          */
-        _replace: function (blockName, BEMJSON, apiRequester) {
-            return BEMTREE.apply(BEMJSON, apiRequester || appApiRequester).then(function (BEMJSON) {
-                IPage.replace(this.findBlockInside(blockName).domElem, BEMHTML.apply(BEMJSON));
+        _update: function (blockName, data) {
+            return BEMTREE.apply({ block: blockName }, data).then(function (BEMJSON) {
+                this.findBlocksInside(blockName).forEach(replaceBlock, BEMHTML.apply(BEMJSON));
             }, this);
         }
 
     });
     provide(IPage);
-
 });

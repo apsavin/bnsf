@@ -5,12 +5,19 @@ oninit(function (exports, context) {
             return typeof obj === 'function';
         };
 
-    function BEMContext (ctx, apply, apiRequester) {
+    function BEMContext (ctx, apply, data) {
         context.BEMContext.call(this, ctx, apply);
         /**
          * @private
          */
-        this._apiRequester = apiRequester;
+        this._apiRequester = data.apiRequester;
+
+        /**
+         * @public
+         * @type {Route}
+         * @see {RouterBase} in router-base npm module
+         */
+        this.route = data.route;
 
         /**
          * cache for apiRequester#get return values

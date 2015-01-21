@@ -16,8 +16,7 @@ block('page-4').content()(function () {
             content: 'current page with not-default parameter'
         },
         {
-            block: 'code-presenter-with-params',
-            tech: this.ctx.route.parameters.tech
+            block: 'code-presenter-with-params'
         }
     ];
 });
