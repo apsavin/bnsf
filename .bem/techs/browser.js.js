@@ -39,11 +39,11 @@ exports.techMixin = {
             deferred = Vow.defer();
         fs.stat(bemtreeFilePath, function (err, statBemtree) {
             if (err) {
-                return deferred.reject(err);
+                return deferred.resolve(false);
             }
             fs.stat(file, function (err, statJs) {
                 if (err) {
-                    return deferred.reject(err);
+                    return deferred.resolve(false);
                 }
                 deferred.resolve(statBemtree.mtime < statJs.mtime);
             });
