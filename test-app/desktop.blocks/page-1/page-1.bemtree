@@ -24,6 +24,11 @@ block('page-1').content()(function () {
             block: 'link',
             url: path('page-5'),
             content: 'page with redirect'
+        },
+        {
+            block: 'link',
+            url: path('page-6'),
+            content: 'dynamic page with params without browser js'
         }
     ];
 });

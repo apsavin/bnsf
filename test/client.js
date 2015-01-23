@@ -78,8 +78,16 @@ var assert = require('assert'),
         phantomHelpers.evaluate([
             {
                 fn: function (options) {
-                    var $link = window.$('a[href="' + options.path + '"]').click();
+                    var $link;
+                    try {
+                        $link = window.$('a[href="' + options.path + '"]').click();
+                    } catch (e) {
+                        throw options.path;
+                    }
                     window.reloadTest = options.random;
+                    if (options.selector) {
+                        window.domReloadTest = window.$(options.selector)[0];
+                    }
                     return $link.length;
                 },
                 argument: options
@@ -111,6 +119,22 @@ var assert = require('assert'),
                 assert.equal(answer.data, random);
             }
         };
+    },
+
+    checkRerender = function (selector, config) {
+        config = config || {};
+        config.topic = function () {
+            phantomHelpers.evaluate([{
+                fn: function (selector) {
+                    return window.$(selector)[0] === window.domReloadTest;
+                },
+                argument: selector
+            }], this.callback);
+        };
+        config['should not rerender ' + selector] = function (answers) {
+            assert.equal(answers[0], true);
+        };
+        return config;
     },
 
     /**
@@ -189,6 +213,7 @@ var assert = require('assert'),
                         return typeof window.$;
                     }, 'function', 100, this.callback);
                 },
+                //second argument is needed for vows
                 'should have jquery': function (err, answer) {
                     assert.equal(err, null);
                 },
@@ -231,7 +256,8 @@ exports.getFirstConfig = function (phantomConfig) {
     });
 };
 
-var random = Math.random();
+var firstRandom = Math.random(),
+    secondRandom = Math.random();
 exports.getSecondConfig = function (phantomConfig) {
     phantomHelpers.config = phantomConfig;
     return prepareMainPage({
@@ -240,18 +266,61 @@ exports.getSecondConfig = function (phantomConfig) {
                 var path = '/dynamic-page-with-params?tech=css';
                 startNavigation({
                     path: path,
-                    random: random
+                    random: firstRandom
                 }, function () {
                     waitForEndOfNavigation(path, 1000, callback);
                 });
             }),
-            'should not reload page': assertPageNavigationEnd(random),
-            'navigation back to main page': checkNavigation('/', 200, {
-                title: checkTitle('main page', {
-                    'navigation to redirect page': checkNavigation('/page-with-redirect', 100, true, {
-                        title: checkTitle('main page')
+            'should not reload page': assertPageNavigationEnd(firstRandom),
+            content: checkContent('1', {
+                'navigation to dynamic page with css param with default param': {
+                    topic: replaceCSS(function (callback) {
+                        var path = '/dynamic-page-with-params?tech=js';
+                        startNavigation({
+                            path: path,
+                            random: firstRandom,
+                            selector: 'a:first'
+                        }, function () {
+                            waitForEndOfNavigation(path, 1000, callback);
+                        });
+                    }),
+                    'should not reload page': assertPageNavigationEnd(firstRandom),
+                    'should not rerender': checkRerender('a:first'),
+                    content: checkContent('1', {
+                        'navigation back to main page': checkNavigation('/', 200, {
+                            title: checkTitle('main page', {
+                                'navigation to redirect page': checkNavigation('/page-with-redirect', 1000, true, {
+                                    title: checkTitle('main page'),
+                                    'navigation to dynamic page with css param without browser js': checkNavigation('/dynamic-page-with-params-without-browser-js', 1000, {
+                                        title: checkTitle('dynamic page with get params without browser js'),
+                                        content: checkContent('node_modules', {
+                                            'check update': {
+                                                topic: replaceCSS(function (callback) {
+                                                    var path = '/dynamic-page-with-params-without-browser-js?tech=css';
+                                                    startNavigation({
+                                                        path: path,
+                                                        random: secondRandom,
+                                                        selector: 'a:first'
+                                                    }, function () {
+                                                        waitForEndOfNavigation(path, 1000, callback);
+                                                    });
+                                                }),
+                                                'should not reload page': assertPageNavigationEnd(secondRandom),
+                                                'should not rerender': checkRerender('a:first', {
+                                                    content: checkContent('1', {
+                                                        'navigation back to main page': checkNavigation('/', 200, {
+                                                            title: checkTitle('main page')
+                                                        })
+                                                    })
+                                                })
+                                            }
+                                        })
+                                    })
+                                })
+                            })
+                        })
                     })
-                })
+                }
             })
         }
     });

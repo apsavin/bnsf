@@ -1,0 +1,1 @@
+block('page-6').elem('title').content()('dynamic page with get params without browser js');

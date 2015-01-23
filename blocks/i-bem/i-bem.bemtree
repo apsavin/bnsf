@@ -104,3 +104,17 @@ oninit(function (exports, context) {
             });
     };
 });
+
+def()(function () {
+    var content = apply('content');
+    if (content || content === 0) {
+        this.ctx.content = apply('', { ctx: content });
+    }
+    var js = apply('js');
+    if (typeof js !== 'undefined') {
+        this.ctx.js = js;
+    }
+    return this.ctx;
+});
+
+js()(undefined);

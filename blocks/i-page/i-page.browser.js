@@ -1,7 +1,7 @@
 /**@module i-page*/
 modules.define('i-page', [
-    'i-bem__dom', 'BEMHTML', 'BEMTREE'
-], function (provide, BEMDOM, BEMHTML, BEMTREE, page) {
+    'i-bem__dom', 'BEMHTML', 'BEMTREE', 'vow'
+], function (provide, BEMDOM, BEMHTML, BEMTREE, Vow, page) {
     "use strict";
 
     /**
@@ -20,30 +20,37 @@ modules.define('i-page', [
     var IPage = BEMDOM.decl(this.name, page.proto, page.static).decl(/**@lends IPage*/{
 
         /**
-         * if this method is defined then partial update is available
+         * if this method returns promise then partial update is available
          * @param {RequestData} data
-         * @returns {Promise}
+         * @returns {?Promise}
          * @method
          * @example
          * update: function (data) {
-         *      return this._replace('some-block', {
-         *          block: 'some-block',
-         *          param: data.route.parameters.param
-         *      });
+         *      return this._update('some-block', data);
          * }
          */
-        update: null,
+        update: function (data) {
+            var blocksForUpdate = this.params.update;
+            if (!blocksForUpdate) {
+                return null;
+            }
+            return this._update.call(this, blocksForUpdate, data);
+        },
 
         /**
-         * @param {String} blockName
+         * you can use several blockNames, data is the last parameter
+         * @param {String|Array} blockName
          * @param {RequestData} data
          * @returns {Promise}
          * @protected
          */
         _update: function (blockName, data) {
-            return BEMTREE.apply({ block: blockName }, data).then(function (BEMJSON) {
-                this.findBlocksInside(blockName).forEach(replaceBlock, BEMHTML.apply(BEMJSON));
-            }, this);
+            var blocks = Array.isArray(blockName) ? blockName : [blockName];
+            return Vow.all(blocks.map(function (blockName) {
+                return BEMTREE.apply({ block: blockName }, data).then(function (BEMJSON) {
+                    this.findBlocksInside(blockName).forEach(replaceBlock, BEMHTML.apply(BEMJSON));
+                }, this);
+            }, this));
         }
 
     });

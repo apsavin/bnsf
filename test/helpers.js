@@ -9,7 +9,10 @@ var fs = require('fs'),
 exports.replaceCSS = function (fn) {
     return function () {
         var _this = this;
-        fs.writeFile(CSS, '1', function () {
+        fs.writeFile(CSS, '1', function (err) {
+            if (err) {
+                console.log(err);
+            }
             fn(function () {
                 var args = arguments;
                 fs.unlink(CSS, function (err) {

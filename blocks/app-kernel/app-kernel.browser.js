@@ -49,7 +49,7 @@ modules.define('app-kernel', [
          * @private
          */
         _isPartialUpdateAvailable: function (page) {
-            return this._currentPageName === page && typeof this._currentPage.update === 'function';
+            return this._currentPageName === page;
         },
 
         /**
@@ -61,8 +61,9 @@ modules.define('app-kernel', [
         _processPage: function (page, data) {
             //abort all app requests on page change
             apiRequester.abort();
-            if (this._isPartialUpdateAvailable(page)) {
-                return this._postProcessPage(this._currentPage.update(data), data);
+            var updatePromise;
+            if (this._isPartialUpdateAvailable(page) && (updatePromise = this._currentPage.update(data))) {
+                return this._postProcessPage(updatePromise, data);
             } else {
                 return this.__base(page, data);
             }
