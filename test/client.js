@@ -325,3 +325,43 @@ exports.getSecondConfig = function (phantomConfig) {
         }
     });
 };
+
+exports.getThirdConfig = function (phantomConfig) {
+    phantomHelpers.config = phantomConfig;
+    var random = Math.random();
+    return prepareMainPage({
+        'navigation to several pages at once': {
+            topic: function () {
+                phantomHelpers.evaluate([
+                    {
+                        fn: function (options) {
+                            var $firstLink = window.$('a[href="/dynamic-page-with-params-without-browser-js"]').click(),
+                                $secondLink = window.$('a[href="/dynamic-page-with-params"]');
+
+                            window.reloadTest = options.random;
+                            setTimeout(function () {
+                                $secondLink.click();
+                            }, 0);
+                            return $firstLink.length + $secondLink.length;
+                        },
+                        argument: {
+                            random: random
+                        }
+                    }
+                ], this.callback);
+            },
+            'should find the links': function (answers) {
+                assert.equal(answers[0], 2);
+            },
+            'wait for url /dynamic-page-with-params': {
+                topic: function () {
+                    waitForEndOfNavigation('/dynamic-page-with-params', 2000, this.callback);
+                },
+                'should not reload page': assertPageNavigationEnd(random),
+                title: checkTitle('dynamic page with get params', {
+                    content: checkContent('node_modules')
+                })
+            }
+        }
+    });
+};

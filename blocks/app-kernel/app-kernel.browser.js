@@ -35,6 +35,22 @@ modules.define('app-kernel', [
         },
 
         /**
+         * @param {number} statusCode
+         * @param {RequestData} data
+         * @returns {boolean} isHandled
+         * @protected
+         */
+        _handleWrongStatusError: function (statusCode, data) {
+            switch (statusCode) {
+                case 0:
+                    // ignore aborted queries
+                    return true;
+                default:
+                    return this.__base(statusCode, data);
+            }
+        },
+
+        /**
          * @param {String} pageName
          * @private
          */

@@ -103,6 +103,9 @@ vows.describe('bnsf-based-app')
         client: client.getSecondConfig(phantom)
     })
     .addBatch({
+        client: client.getThirdConfig(phantom)
+    })
+    .addBatch({
         end: {
             'kill the servers': function () {
                 phantom.instance.exit();

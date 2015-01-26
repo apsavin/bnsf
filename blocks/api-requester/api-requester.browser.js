@@ -5,6 +5,21 @@ modules.define('api-requester', [
     "use strict";
 
     /**
+     * @param {Deferred} deferred
+     * @param {*} error
+     * @param {XMLHttpRequest} xhr
+     */
+    var rejectDeferred = function (deferred, error, xhr) {
+        deferred.reject({
+            error: error,
+            response: {
+                statusCode: xhr.status,
+                statusText: xhr.statusText
+            }
+        });
+    };
+
+    /**
      * @class ApiRequester
      * @extends BEM
      * @exports
@@ -118,9 +133,9 @@ modules.define('api-requester', [
          */
         _prepareUrl: function (route, routeParameters) {
             return this._apiPath + '?' + $.param({
-                r: route,
-                rP: routeParameters
-            });
+                    r: route,
+                    rP: routeParameters
+                });
         },
 
         /**
@@ -147,10 +162,7 @@ modules.define('api-requester', [
                     }
                 },
                 error: function (xhr, statusText, error) {
-                    deferred.reject({
-                        error: error,
-                        response: xhr
-                    });
+                    rejectDeferred(deferred, error, xhr);
                 },
                 complete: this._onXhrComplete
             }));
@@ -181,19 +193,13 @@ modules.define('api-requester', [
                         });
                     } else {
                         requests.forEach(function (request) {
-                            request.deferred.reject({
-                                error: responses,
-                                response: xhr
-                            });
+                            rejectDeferred(request.deferred, responses, xhr);
                         });
                     }
                 },
                 error: function (xhr, statusText, error) {
                     requests.forEach(function (request) {
-                        request.deferred.reject({
-                            error: error,
-                            response: xhr
-                        });
+                        rejectDeferred(request.deferred, error, xhr);
                     });
                 },
                 complete: this._onXhrComplete

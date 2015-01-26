@@ -144,14 +144,31 @@ modules.define('app-kernel', [
             }
             e.handled = true;
             var statusCode = e.response ? e.response.statusCode : undefined;
-            if (statusCode === 404) {
-                this._handlePage404Error(data);
-            } else if (statusCode === 403) {
-                this._handlePage403Error(data);
-            } else if (e.redirect) {
-                this._redirect(e.path, data);
-            } else {
-                this._handlePageError(data);
+            if (!this._handleWrongStatusError(statusCode, data)) {
+                if (e.redirect) {
+                    this._redirect(e.path, data);
+                } else {
+                    this._handlePageError(data);
+                }
+            }
+        },
+
+        /**
+         * @param {number} statusCode
+         * @param {RequestData} data
+         * @returns {boolean} isHandled
+         * @protected
+         */
+        _handleWrongStatusError: function (statusCode, data) {
+            switch (statusCode) {
+                case 404:
+                    this._handlePage404Error(data);
+                    return true;
+                case 403:
+                    this._handlePage403Error(data);
+                    return true;
+                default:
+                    return false;
             }
         },
 
