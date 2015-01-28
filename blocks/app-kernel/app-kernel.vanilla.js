@@ -139,8 +139,7 @@ modules.define('app-kernel', [
         _onPageProcessError: function (data) {
             var e = data.error;
             if (e.handled) {
-                logger.error(data);
-                throw new Error(data);
+                throw new Error(e);
             }
             e.handled = true;
             var statusCode = e.response ? e.response.statusCode : undefined;
@@ -257,7 +256,8 @@ modules.define('app-kernel', [
             return promise.then(function () {
                 return this._onPageProcessSuccess(data);
             }, function (e) {
-                data.error = e;
+                // if error already exists we should report it first
+                data.error = data.error || e;
                 return this._onPageProcessError(data);
             }, this);
         },

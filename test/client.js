@@ -69,7 +69,7 @@ var assert = require('assert'),
             }], this.callback);
         };
         config['should be "' + title + '"'] = function (realTitle) {
-            assert.equal(title, realTitle);
+            assert.equal(realTitle, title);
         };
         return config;
     },
