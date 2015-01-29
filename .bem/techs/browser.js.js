@@ -7,6 +7,17 @@ var PATH = require('path'),
 
 exports.baseTechPath = PATH.resolve(BEMCORE_TECHS, 'browser.js.js');
 
+var fileStat = function (path) {
+    var deferred = Vow.defer();
+    fs.stat(path, function (err, stat) {
+        if (err) {
+            return deferred.resolve(false);
+        }
+        deferred.resolve(stat);
+    });
+    return deferred.promise();
+};
+
 exports.techMixin = {
     /**
      * @param {string} initialShift
@@ -28,27 +39,22 @@ exports.techMixin = {
     },
 
     /**
-     * Here we check that bemtree output is not newer than browser.js output
+     * Here we check that bemtree and bemhtml output is not newer than browser.js output
      * @param {String} file File which is being built
      * @param {Object[]} files The list of files which will be used.
      * @param {Object} opts Custom options.
      * @return {Promise}
      */
     validate: function (file, files, opts) {
-        var bemtreeFilePath = opts.outputName + '.bemtree.js',
-            deferred = Vow.defer();
-        fs.stat(bemtreeFilePath, function (err, statBemtree) {
-            if (err) {
-                return deferred.resolve(false);
-            }
-            fs.stat(file, function (err, statJs) {
-                if (err) {
-                    return deferred.resolve(false);
-                }
-                deferred.resolve(statBemtree.mtime < statJs.mtime);
+        var bemhtmlPath = opts.outputName + '.bemtree.js',
+            bemtreePath = opts.outputName + '.bemhtml.js',
+            stats = [file, bemtreePath, bemhtmlPath].map(fileStat),
+            isNewerThanBemhtmlAndBemtree = Vow.all(stats).then(function (value) {
+                return value[0] && value[1] && value[2] && // no errors
+                    value[0].mtime > value[1].mtime && // newer than bemtree
+                    value[0].mtime > value[2].mtime; // newer than bemhtml
             });
-        });
-        return Vow.all([deferred.promise(), this.__base(file, files, opts)]).then(function (value) {
+        return Vow.all([isNewerThanBemhtmlAndBemtree, this.__base(file, files, opts)]).then(function (value) {
             return value[0] && value[1];
         });
     }
