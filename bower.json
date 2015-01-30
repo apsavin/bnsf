@@ -1,6 +1,6 @@
 {
   "name": "bnsf",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "bnsf",
   "repository": {
     "type": "git",
@@ -21,7 +21,7 @@
     "spa"
   ],
   "dependencies": {
-    "bem-core": "v2.5.0"
+    "bem-core": "2.5.1"
   },
   "devDependencies" : {
     "bem-pr" : "narqo/bem-pr#0.8.1-beta3"
