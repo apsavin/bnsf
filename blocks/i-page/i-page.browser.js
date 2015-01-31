@@ -5,7 +5,7 @@ modules.define('i-page', [
     "use strict";
 
     /**
-     * @param {BEM.DOM} block
+     * @param {BEMDOM} block
      * @this {string} html
      */
     var replaceBlock = function (block) {
@@ -13,8 +13,17 @@ modules.define('i-page', [
     };
 
     /**
+     * @param {object} BEMJSON
+     * @this {Array} of BEMDOM instances
+     * @returns {Array}
+     */
+    var replaceBlocks = function (BEMJSON) {
+        return this.forEach(replaceBlock, BEMHTML.apply(BEMJSON));
+    };
+
+    /**
      * @class IPage
-     * @extends BEM.DOM
+     * @extends BEMDOM
      * @exports
      */
     var IPage = BEMDOM.decl(this.name, page.proto, page.static).decl(/**@lends IPage*/{
@@ -38,19 +47,37 @@ modules.define('i-page', [
         },
 
         /**
-         * you can use several blockNames, data is the last parameter
+         * runs when user leaves the page
+         * you can show a page-related spinner here
+         * @public
+         */
+        leave: function () {
+        },
+
+        /**
          * @param {String|Array} blockName
          * @param {RequestData} data
          * @returns {Promise}
          * @protected
          */
         _update: function (blockName, data) {
-            var blocks = Array.isArray(blockName) ? blockName : [blockName];
-            return Vow.all(blocks.map(function (blockName) {
-                return BEMTREE.apply({ block: blockName }, data).then(function (BEMJSON) {
-                    this.findBlocksInside(blockName).forEach(replaceBlock, BEMHTML.apply(BEMJSON));
-                }, this);
+            var blocksNames = Array.isArray(blockName) ? blockName : [blockName];
+            return Vow.all(blocksNames.map(function (blockName) {
+                var blocks = this.findBlocksInside(blockName);
+                if (!blocks.length) {
+                    return Vow.resolve();
+                }
+                this._onPartUpdateStart(blocks, blockName);
+                return BEMTREE.apply({ block: blockName }, data).then(replaceBlocks, blocks);
             }, this));
+        },
+
+        /**
+         * @param {Array.<BEMDOM>} blocks
+         * @param {string} name
+         * @protected
+         */
+        _onPartUpdateStart: function (blocks, name) {
         }
 
     });

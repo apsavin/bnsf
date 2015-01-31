@@ -6,7 +6,7 @@ modules.define('app-kernel', [
 
     /**
      * @class AppKernel
-     * @extends BEM.DOM
+     * @extends BEMDOM
      * @exports
      */
     provide(BEMDOM.decl(this.name, appKernelDecl).decl(/**@lends AppKernel.prototype*/{
@@ -55,7 +55,15 @@ modules.define('app-kernel', [
          * @private
          */
         _cacheCurrentPage: function (pageName) {
+            /**
+             * @type {BEMDOM}
+             * @private
+             */
             this._currentPage = this.findBlockInside(pageName);
+            /**
+             * @type {String}
+             * @private
+             */
             this._currentPageName = pageName;
         },
 
@@ -81,6 +89,7 @@ modules.define('app-kernel', [
             if (this._isPartialUpdateAvailable(page) && (updatePromise = this._currentPage.update(data))) {
                 return this._postProcessPage(updatePromise, data);
             } else {
+                this._currentPage.leave();
                 return this.__base(page, data);
             }
         },
@@ -112,6 +121,7 @@ modules.define('app-kernel', [
          * @protected
          */
         _redirect: function (url, data) {
+            this._currentPage.leave();
             window.location = url;
         }
     }));
