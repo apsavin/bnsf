@@ -29,6 +29,11 @@ block('page-1').content()(function () {
             block: 'link',
             url: path('page-6'),
             content: 'dynamic page with params without browser js'
+        },
+        {
+            block: 'link',
+            url: path('page-7'),
+            content: 'dynamic page elem update'
         }
     ];
 });

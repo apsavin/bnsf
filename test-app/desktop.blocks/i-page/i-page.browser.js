@@ -1,35 +1,52 @@
 /**@module i-page*/
 modules.define('i-page', [
-    'BEMHTML', 'BEMTREE', 'vow'
-], function (provide, BEMHTML, BEMTREE, Vow, IPage) {
+    'i-bem__dom', 'BEMHTML', 'BEMTREE', 'vow', 'jquery'
+], function (provide, BEMDOM, BEMHTML, BEMTREE, Vow, $, page) {
     "use strict";
 
     /**
-     * @param {BEM.DOM} block
+     * @param {BEMDOM|jQuery} block
      * @this {string} html
      */
     var replaceBlock = function (block) {
-        IPage.replace(block.domElem, this);
+        IPage.replace(block.domElem || block, this);
     };
 
-    provide(IPage.decl(/**@lends IPage*/{
+    /**
+     * @param {object} BEMJSON
+     * @this {Array.<BEMDOM|jQuery>}
+     * @returns {Array}
+     */
+    var replaceBlocks = function (BEMJSON) {
+        //todo: figure out why phantom doesn't understand array.forEach(fn, context) here
+        return this.forEach(replaceBlock.bind(BEMHTML.apply(BEMJSON)));
+    };
+
+    /**
+     * @class IPage
+     * @extends BEMDOM
+     * @exports
+     */
+    var IPage = BEMDOM.decl(this.name, page.proto, page.static).decl(/**@lends IPage*/{
 
         /**
-         * you can use several blockNames, data is the last parameter
-         * @param {String|Array} blockName
+         * @param {string|{block: string|undefined, elem: string|undefined}|Array} partDecl
          * @param {RequestData} data
          * @returns {Promise}
          * @protected
          */
-        _update: function (blockName, data) {
-            var blocks = Array.isArray(blockName) ? blockName : [blockName];
-            return Vow.all(blocks.map(function (blockName) {
-                return BEMTREE.apply({ block: blockName }, data).then(function (BEMJSON) {
-                    //todo: figure out why phantom don't understand array.forEach(fn, context) here
-                    this.findBlocksInside(blockName).forEach(replaceBlock.bind(BEMHTML.apply(BEMJSON)));
-                }, this);
+        _update: function (partDecl, data) {
+            var partsDecls = Array.isArray(partDecl) ? partDecl : [partDecl];
+            return Vow.all(partsDecls.map(function (partDecl) {
+                partDecl = this._normalizePartDecl(partDecl);
+                var parts = this._getPartsByDecl(partDecl);
+                if (!parts.length) {
+                    return Vow.resolve();
+                }
+                this._onPartUpdateStart(parts, partDecl);
+                return BEMTREE.apply(partDecl, data).then(replaceBlocks, parts);
             }, this));
         }
-
-    }));
+    });
+    provide(IPage);
 });

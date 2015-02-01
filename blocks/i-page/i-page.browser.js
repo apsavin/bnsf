@@ -1,24 +1,32 @@
 /**@module i-page*/
 modules.define('i-page', [
-    'i-bem__dom', 'BEMHTML', 'BEMTREE', 'vow'
-], function (provide, BEMDOM, BEMHTML, BEMTREE, Vow, page) {
+    'i-bem__dom', 'BEMHTML', 'BEMTREE', 'vow', 'jquery'
+], function (provide, BEMDOM, BEMHTML, BEMTREE, Vow, $, page) {
     "use strict";
 
     /**
-     * @param {BEMDOM} block
+     * @param {BEMDOM|jQuery} block
      * @this {string} html
      */
     var replaceBlock = function (block) {
-        IPage.replace(block.domElem, this);
+        IPage.replace(block.domElem || block, this);
     };
 
     /**
      * @param {object} BEMJSON
-     * @this {Array} of BEMDOM instances
+     * @this {Array.<BEMDOM|jQuery>}
      * @returns {Array}
      */
     var replaceBlocks = function (BEMJSON) {
         return this.forEach(replaceBlock, BEMHTML.apply(BEMJSON));
+    };
+
+    /**
+     * @param {Element} el
+     * @returns {jQuery}
+     */
+    var wrapJQuery = function (el) {
+        return $(el);
     };
 
     /**
@@ -39,11 +47,11 @@ modules.define('i-page', [
          * }
          */
         update: function (data) {
-            var blocksForUpdate = this.params.update;
-            if (!blocksForUpdate) {
+            var partsForUpdate = this.params.update;
+            if (!partsForUpdate) {
                 return null;
             }
-            return this._update.call(this, blocksForUpdate, data);
+            return this._update.call(this, partsForUpdate, data);
         },
 
         /**
@@ -55,29 +63,64 @@ modules.define('i-page', [
         },
 
         /**
-         * @param {String|Array} blockName
+         * @param {string|{block: string|undefined, elem: string|undefined}|Array} partDecl
          * @param {RequestData} data
          * @returns {Promise}
          * @protected
          */
-        _update: function (blockName, data) {
-            var blocksNames = Array.isArray(blockName) ? blockName : [blockName];
-            return Vow.all(blocksNames.map(function (blockName) {
-                var blocks = this.findBlocksInside(blockName);
-                if (!blocks.length) {
+        _update: function (partDecl, data) {
+            var partsDecls = Array.isArray(partDecl) ? partDecl : [partDecl];
+            return Vow.all(partsDecls.map(function (partDecl) {
+                partDecl = this._normalizePartDecl(partDecl);
+                var parts = this._getPartsByDecl(partDecl);
+                if (!parts.length) {
                     return Vow.resolve();
                 }
-                this._onPartUpdateStart(blocks, blockName);
-                return BEMTREE.apply({ block: blockName }, data).then(replaceBlocks, blocks);
+                this._onPartUpdateStart(parts, partDecl);
+                return BEMTREE.apply(partDecl, data).then(replaceBlocks, parts);
             }, this));
         },
 
         /**
-         * @param {Array.<BEMDOM>} blocks
-         * @param {string} name
+         * @param {string|{block: string|undefined, elem: string|undefined}} decl
+         * @returns {{block: string, elem: string|undefined}}
+         * @private
+         */
+        _normalizePartDecl: function (decl) {
+            decl = typeof decl === 'string' ? { block: decl } : decl;
+            decl.block = decl.block || this.__self.getName();
+            return decl;
+        },
+
+        /**
+         * @param {{block: string, elem: string|undefined}} decl
+         * @returns {Array.<BEMDOM|jQuery>}
+         * @private
+         */
+        _getPartsByDecl: function (decl) {
+            var parts;
+            if (decl.block !== this.__self.getName()) {
+                parts = this.findBlocksInside(decl.block);
+                if (decl.elem) {
+                    parts = parts.map(function (part) {
+                        return part.findElem(decl.elem);
+                    });
+                }
+            } else {
+                parts = this.findElem(decl.elem);
+            }
+            if (!Array.isArray(parts)) {
+                parts = $.map(parts, wrapJQuery);
+            }
+            return parts;
+        },
+
+        /**
+         * @param {Array.<BEMDOM|jQuery>} parts
+         * @param {string|object} decl
          * @protected
          */
-        _onPartUpdateStart: function (blocks, name) {
+        _onPartUpdateStart: function (parts, decl) {
         }
 
     });

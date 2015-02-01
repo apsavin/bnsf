@@ -80,6 +80,7 @@ vows.describe('bnsf-based-app')
                     phantomInstance.createPage(function (page) {
                         phantom.page = page;
                         console.log('phantom started');
+                        page.onConsoleMessage(function(msg) {console.log('PHANTOM ' + msg); });
                         if (bnsfStarted && bemStarted && !callbackCalled) {
                             _this.callback();
                         }

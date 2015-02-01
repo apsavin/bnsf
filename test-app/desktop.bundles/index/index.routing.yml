@@ -21,3 +21,6 @@
 
 - id: page-6
   path: /dynamic-page-with-params-without-browser-js
+
+- id: page-7
+  path: /dynamic-page-elem-update

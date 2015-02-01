@@ -20,6 +20,13 @@ oninit(function (exports, context) {
         this.route = data.route;
 
         /**
+         * @public
+         * @type {object}
+         * @see RequestData request property
+         */
+        this.request = data.request;
+
+        /**
          * cache for apiRequester#get return values
          * @type {object.<Promise>}
          */

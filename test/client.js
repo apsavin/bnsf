@@ -220,6 +220,39 @@ var assert = require('assert'),
                 title: checkTitle('main page', config)
             }
         };
+    },
+
+    checkBrowserUpdate = function (options, config) {
+        return {
+            'navigation back to main page': checkNavigation('/', 200, {
+                title: checkTitle('main page', {
+                    'navigation to redirect page': checkNavigation('/page-with-redirect', 1000, true, {
+                        title: checkTitle('main page'),
+                        'navigation to dynamic page': checkNavigation(options.pages[0].path, 1000, {
+                            title: checkTitle(options.pages[0].title),
+                            content: checkContent(options.pages[0].content, {
+                                'check update': {
+                                    topic: replaceCSS(function (callback) {
+                                        var path = options.pages[1].path;
+                                        startNavigation({
+                                            path: path,
+                                            random: options.random,
+                                            selector: 'a:first'
+                                        }, function () {
+                                            waitForEndOfNavigation(path, 1000, callback);
+                                        });
+                                    }),
+                                    'should not reload page': assertPageNavigationEnd(options.random),
+                                    'should not rerender': checkRerender('a:first', {
+                                        content: checkContent(options.pages[1].content, config)
+                                    })
+                                }
+                            })
+                        })
+                    })
+                })
+            })
+        };
     };
 
 exports.getFirstConfig = function (phantomConfig) {
@@ -256,8 +289,7 @@ exports.getFirstConfig = function (phantomConfig) {
     });
 };
 
-var firstRandom = Math.random(),
-    secondRandom = Math.random();
+var random = Math.random();
 exports.getSecondConfig = function (phantomConfig) {
     phantomHelpers.config = phantomConfig;
     return prepareMainPage({
@@ -266,60 +298,57 @@ exports.getSecondConfig = function (phantomConfig) {
                 var path = '/dynamic-page-with-params?tech=css';
                 startNavigation({
                     path: path,
-                    random: firstRandom
+                    random: random
                 }, function () {
                     waitForEndOfNavigation(path, 1000, callback);
                 });
             }),
-            'should not reload page': assertPageNavigationEnd(firstRandom),
+            'should not reload page': assertPageNavigationEnd(random),
             content: checkContent('1', {
                 'navigation to dynamic page with css param with default param': {
                     topic: replaceCSS(function (callback) {
                         var path = '/dynamic-page-with-params?tech=js';
                         startNavigation({
                             path: path,
-                            random: firstRandom,
+                            random: random,
                             selector: 'a:first'
                         }, function () {
                             waitForEndOfNavigation(path, 1000, callback);
                         });
                     }),
-                    'should not reload page': assertPageNavigationEnd(firstRandom),
+                    'should not reload page': assertPageNavigationEnd(random),
                     'should not rerender': checkRerender('a:first'),
-                    content: checkContent('1', {
+                    content: checkContent('1', checkBrowserUpdate({
+                        pages: [
+                            {
+                                path: '/dynamic-page-with-params-without-browser-js',
+                                title: 'dynamic page with get params without browser js',
+                                content: 'node_modules'
+                            },
+                            {
+                                path: '/dynamic-page-with-params-without-browser-js?tech=css',
+                                content: '1'
+                            }
+                        ],
+                        random: Math.random()
+                    }, checkBrowserUpdate({
+                        pages: [
+                            {
+                                path: '/dynamic-page-elem-update',
+                                title: 'dynamic page elem update',
+                                content: 'node_modules'
+                            },
+                            {
+                                path: '/dynamic-page-elem-update?tech=css',
+                                content: '1'
+                            }
+                        ],
+                        random: Math.random()
+                    }, {
                         'navigation back to main page': checkNavigation('/', 200, {
-                            title: checkTitle('main page', {
-                                'navigation to redirect page': checkNavigation('/page-with-redirect', 1000, true, {
-                                    title: checkTitle('main page'),
-                                    'navigation to dynamic page with css param without browser js': checkNavigation('/dynamic-page-with-params-without-browser-js', 1000, {
-                                        title: checkTitle('dynamic page with get params without browser js'),
-                                        content: checkContent('node_modules', {
-                                            'check update': {
-                                                topic: replaceCSS(function (callback) {
-                                                    var path = '/dynamic-page-with-params-without-browser-js?tech=css';
-                                                    startNavigation({
-                                                        path: path,
-                                                        random: secondRandom,
-                                                        selector: 'a:first'
-                                                    }, function () {
-                                                        waitForEndOfNavigation(path, 1000, callback);
-                                                    });
-                                                }),
-                                                'should not reload page': assertPageNavigationEnd(secondRandom),
-                                                'should not rerender': checkRerender('a:first', {
-                                                    content: checkContent('1', {
-                                                        'navigation back to main page': checkNavigation('/', 200, {
-                                                            title: checkTitle('main page')
-                                                        })
-                                                    })
-                                                })
-                                            }
-                                        })
-                                    })
-                                })
-                            })
+                            title: checkTitle('main page')
                         })
-                    })
+                    })))
                 }
             })
         }
