@@ -1,12 +1,29 @@
 modules.define('history', ['inherit', 'events', 'jquery'], function (provide, inherit, events, $) {
 
-    provide(inherit(events.Emitter, {
+    /**
+     * @class History
+     * @extends Emitter
+     */
+    provide(inherit(events.Emitter, /**@lends History#*/{
 
+        /**
+         * @constructs
+         */
         __constructor: function () {
             if (history.state === null) {
                 history.replaceState(undefined, document.title);
             }
+            this._sensibleUrlFragment = this._getSensibleUrlFragment();
             $(window).on('popstate', this._onPopState.bind(this));
+        },
+
+        /**
+         * @returns {String}
+         * @protected
+         */
+        _getSensibleUrlFragment: function () {
+            var url = window.location;
+            return url.pathname + url.search;
         },
 
         /**
@@ -15,7 +32,7 @@ modules.define('history', ['inherit', 'events', 'jquery'], function (provide, in
          * @param {Object} state New state.
          * @param {String} title Document title.
          * @param {String} [url] Location url.
-         * @returns {Object}
+         * @returns {History}
          */
         pushState: function (state, title, url) {
             return this._changeState('push', arguments);
@@ -27,7 +44,7 @@ modules.define('history', ['inherit', 'events', 'jquery'], function (provide, in
          * @param {Object} state New state.
          * @param {String} title Document title.
          * @param {String} [url] Location url.
-         * @returns {Object}
+         * @returns {History}
          */
         replaceState: function (state, title, url) {
             return this._changeState('replace', arguments);
@@ -38,34 +55,27 @@ modules.define('history', ['inherit', 'events', 'jquery'], function (provide, in
          *
          * @param {String} method Push or replace method.
          * @param {Array} args Real method params.
-         * @returns {Object}
-         * @private
+         * @returns {History}
+         * @protected
          */
         _changeState: function (method, args) {
-            var state = this.state = args[0];
-
-            try {
-                history[method + 'State'].apply(history, args);
-            } catch (e) {
-                return this.emit('error', { state: state, error: e });
-            }
-
-            return this.emit('statechange', { state: state });
+            history[method + 'State'].apply(history, args);
+            this._sensibleUrlFragment = this._getSensibleUrlFragment();
+            return this;
         },
 
         /**
-         * Reaction for popstate jQuery event.
-         * @param {Event} e
-         * @private
+         * Reaction for popstate window event.
+         * @protected
          */
-        _onPopState: function (e) {
-            var state = e.originalEvent.state;
-            // ignore initial popstate
-            if (state === null) {
-                return;
+        _onPopState: function () {
+            var sensibleUrlFragment = this._getSensibleUrlFragment();
+            if (this._sensibleUrlFragment !== sensibleUrlFragment) {
+                this._sensibleUrlFragment = sensibleUrlFragment;
+                this.emit('popsensibleurlfragment', {
+                    sensibleUrlFragment: sensibleUrlFragment
+                });
             }
-            this.state = state;
-            this.emit('statechange', { state: state });
         }
     }));
 

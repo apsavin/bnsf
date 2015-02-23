@@ -1,0 +1,20 @@
+//(function (window, locationPropertyName) {
+//    var history = window.history,
+//        location = window[locationPropertyName],
+//        hash = location.hash,
+//        isHashNavigationUrl = hash && hash.charAt(1) === '/',
+//        isHistoryWorks = history && history.pushState;
+//    if (isHistoryWorks && isHashNavigationUrl) {
+//        window[locationPropertyName] = hash.replace('#', '');
+//    } else if (!isHistoryWorks && !isHashNavigationUrl) {
+//        window[locationPropertyName] = '/#' + location.pathname + location.search;
+//    }
+//})(window, 'location');
+
+block('history')(
+    tag()('script'),
+    bem()(false),
+    content()([
+        '!function(a,b){var c=a.history,d=a[b],e=d.hash,f=e&&"/"===e.charAt(1),g=c&&c.pushState;g&&f?a[b]=e.replace("#",""):g||f||(a[b]="/#"+d.pathname+d.search)}(window,"location");'
+    ])
+);

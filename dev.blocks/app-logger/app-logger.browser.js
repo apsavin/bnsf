@@ -5,6 +5,6 @@ modules.define('app-logger', ['logger'], function (provide, Logger) {
      * @exports Logger
      */
     provide(new Logger(null, {
-        logger: console
+        logger: window.console
     }));
 });

@@ -31,16 +31,39 @@ modules.define('logger', ['i-bem', 'functions'], function (provide, BEM, functio
             }
         },
 
+        /**
+         * @param {string} level
+         * @param {Array.<String>} messages
+         * @returns {Logger}
+         * @private
+         */
+        _report: function (level, messages) {
+            this._logger[level].apply(this._logger, messages);
+            return this;
+        },
+
+        /**
+         * @param {String} message
+         * @returns {Logger}
+         */
         info: function (message) {
-            this._logger.info.apply(console, arguments);
+            return this._report('info', Array.prototype.slice.call(arguments));
         },
 
+        /**
+         * @param {String} message
+         * @returns {Logger}
+         */
         warn: function (message) {
-            this._logger.warn.apply(console, arguments);
+            return this._report('warn', Array.prototype.slice.call(arguments));
         },
 
+        /**
+         * @param {String} message
+         * @returns {Logger}
+         */
         error: function (message) {
-            this._logger.error.apply(console, arguments);
+            return this._report('error', Array.prototype.slice.call(arguments));
         }
     }));
 });

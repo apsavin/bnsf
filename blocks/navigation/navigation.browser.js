@@ -18,26 +18,9 @@ modules.define('navigation', [
                  * @this Navigation
                  */
                 inited: function () {
-                    this._initPopStateListener();
                     this._initHistory();
                 }
             }
-        },
-
-        /**
-         * @private
-         */
-        _initPopStateListener: function () {
-            var _this = this;
-            $(window).on('popstate', function () {
-                _this.emit('request', {
-                    request: {
-                        url: location.pathname + location.search,
-                        isUrlUpdated: true,
-                        method: 'GET'
-                    }
-                });
-            });
         },
 
         /**
@@ -49,6 +32,31 @@ modules.define('navigation', [
              * @private
              */
             this._history = new History();
+            this._history.on('popsensibleurlfragment', this._onPopSensibleUrlFragment, this);
+        },
+
+        /**
+         * @param {Event} e
+         * @param {{sensibleUrlFragment: string}} data
+         * @private
+         */
+        _onPopSensibleUrlFragment: function (e, data) {
+            this.emit('request', this._getRequestByHistoryEventData(data.sensibleUrlFragment));
+        },
+
+        /**
+         * @param {string} url
+         * @returns {{request: {url: *, isUrlUpdated: boolean, method: string}}}
+         * @protected
+         */
+        _getRequestByHistoryEventData: function (url) {
+            return {
+                request: {
+                    url: url,
+                    isUrlUpdated: true,
+                    method: 'GET'
+                }
+            };
         },
 
         /**

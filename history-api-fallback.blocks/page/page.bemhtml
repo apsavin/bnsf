@@ -1,0 +1,10 @@
+block('page')(
+    elem('head')(
+        content()(function () {
+            return [
+                applyNext(),
+                { block: 'history' }
+            ];
+        })
+    )
+);

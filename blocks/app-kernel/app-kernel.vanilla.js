@@ -71,7 +71,7 @@ modules.define('app-kernel', [
         },
 
         /**
-         * @private
+         * @protected
          */
         _initRequestListener: function () {
             this._requestListener = new RequestListener(null, this._getRequestListenerParams());
@@ -94,7 +94,7 @@ modules.define('app-kernel', [
          * @param {Event} e
          * @param {Object} data
          * @listens RequestListener#request
-         * @private
+         * @protected
          */
         _onRequest: function (e, data) {
             this._processRequest(this._fillRequestData(data));

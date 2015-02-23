@@ -1,5 +1,5 @@
 var assert = require('assert'),
-    replaceCSS = require('./helpers').replaceCSS,
+    getReplaceCSS = require('./helpers').getReplaceCSS,
     phantomHelpers = {
         /**
          * @param {Array.<function|{fn: function, argument: *}>} functions to call one by one
@@ -232,7 +232,7 @@ var assert = require('assert'),
                             title: checkTitle(options.pages[0].title),
                             content: checkContent(options.pages[0].content, {
                                 'check update': {
-                                    topic: replaceCSS(function (callback) {
+                                    topic: options.replaceCSS(function (callback) {
                                         var path = options.pages[1].path;
                                         startNavigation({
                                             path: path,
@@ -255,7 +255,7 @@ var assert = require('assert'),
         };
     };
 
-exports.getFirstConfig = function (phantomConfig) {
+exports.getFirstConfig = function (paths, phantomConfig) {
     phantomHelpers.config = phantomConfig;
     return prepareMainPage({
         'navigation to static page': checkNavigation('/another-page/file', 200, {
@@ -290,8 +290,9 @@ exports.getFirstConfig = function (phantomConfig) {
 };
 
 var random = Math.random();
-exports.getSecondConfig = function (phantomConfig) {
+exports.getSecondConfig = function (paths, phantomConfig) {
     phantomHelpers.config = phantomConfig;
+    var replaceCSS = getReplaceCSS(paths.CSS);
     return prepareMainPage({
         'navigation to dynamic page with css param while css exist': {
             topic: replaceCSS(function (callback) {
@@ -319,6 +320,7 @@ exports.getSecondConfig = function (phantomConfig) {
                     'should not reload page': assertPageNavigationEnd(random),
                     'should not rerender': checkRerender('a:first'),
                     content: checkContent('1', checkBrowserUpdate({
+                        replaceCSS: replaceCSS,
                         pages: [
                             {
                                 path: '/dynamic-page-with-params-without-browser-js',
@@ -332,6 +334,7 @@ exports.getSecondConfig = function (phantomConfig) {
                         ],
                         random: Math.random()
                     }, checkBrowserUpdate({
+                        replaceCSS: replaceCSS,
                         pages: [
                             {
                                 path: '/dynamic-page-elem-update',
@@ -355,7 +358,7 @@ exports.getSecondConfig = function (phantomConfig) {
     });
 };
 
-exports.getThirdConfig = function (phantomConfig) {
+exports.getThirdConfig = function (paths, phantomConfig) {
     phantomHelpers.config = phantomConfig;
     var random = Math.random();
     return prepareMainPage({

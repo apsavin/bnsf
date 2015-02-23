@@ -9,7 +9,7 @@ modules.define('i-page', [
      * @this {string} html
      */
     var replaceBlock = function (block) {
-        IPage.replace(block.domElem || block, this);
+        IPage.replace(block.domElem || block, this + '');
     };
 
     /**

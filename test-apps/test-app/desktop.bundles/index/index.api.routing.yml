@@ -1,0 +1,8 @@
+- id: some_api_route
+  path: /desktop.bundles/index/_index.js
+  host: localhost:8080
+
+- id: some_api_route_with_params
+  path: /desktop.bundles/index/_index.{tech}
+  host: localhost:8080
+  requirements: {tech: js|css}
