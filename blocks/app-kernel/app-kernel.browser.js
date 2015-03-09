@@ -109,8 +109,11 @@ modules.define('app-kernel', [
          * @protected
          */
         _writeResponse: function (html, data, Page) {
-            var $html = $(html);
-            BEMDOM.replace(this._currentPage.domElem, $html.filter(Page.buildSelector()));
+            var $html = $(html),
+                pageSelector = Page.buildSelector(),
+                $page = $html.filter(pageSelector);
+            $page = $page.length ? $page : $html.find(pageSelector);
+            BEMDOM.replace(this._currentPage.domElem, $page);
             this._cacheCurrentPage(Page.getName());
             document.title = $html.filter('title').text();
         },

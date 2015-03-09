@@ -1,0 +1,36 @@
+block('page-7')(
+    elem('title').content()('dynamic page elem update'),
+    content()(function () {
+        return [
+            {
+                block: 'link',
+                url: path('page-1'),
+                content: 'main page'
+            },
+            {
+                block: 'link',
+                url: path('page-7', { tech: 'js' }),
+                content: 'current page with default parameter'
+            },
+            {
+                block: 'link',
+                url: path('page-7', { tech: 'css' }),
+                content: 'current page with not-default parameter'
+            },
+            {
+                elem: 'code-presenter'
+            }
+        ];
+    }),
+    js()({
+        update: {
+            elem: 'code-presenter'
+        }
+    }),
+    elem('code-presenter').content()(function () {
+        return {
+            block: 'code-presenter-with-params'
+        };
+    })
+);
+

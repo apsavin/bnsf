@@ -1,0 +1,3 @@
+block('page-5').content()(function () {
+    redirect(path('page-1'));
+});

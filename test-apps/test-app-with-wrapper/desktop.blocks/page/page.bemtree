@@ -1,0 +1,11 @@
+block('page').content()(function () {
+    return [
+        {
+            block: 'header'
+        },
+        {
+            elem: 'content',
+            content: applyNext()
+        }
+    ];
+});
