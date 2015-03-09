@@ -110,6 +110,8 @@ oninit(function (exports, context) {
                 return ctx._buf;
             });
     };
+
+    BEMContext.prototype.reapply = BEMContext.applyAsync;
 });
 
 def()(function () {
