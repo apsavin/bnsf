@@ -24,3 +24,6 @@
 
 - id: page-7
   path: /dynamic-page-elem-update
+
+- id: page-8
+  path: /page-with-cookies

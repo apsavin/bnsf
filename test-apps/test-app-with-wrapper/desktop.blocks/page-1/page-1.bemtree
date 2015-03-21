@@ -34,6 +34,11 @@ block('page-1').content()(function () {
             block: 'link',
             url: path('page-7'),
             content: 'dynamic page elem update'
+        },
+        {
+            block: 'link',
+            url: path('page-8'),
+            content: 'page with cookies'
         }
     ];
 });

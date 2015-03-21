@@ -19,6 +19,7 @@ module.exports.getConfig = function (paths) {
                     params: ['/dynamic-page-with-params?tech=css', 200, 'dynamic page with get params', '1']
                 }])
             }
-        }
+        },
+        ['/page-with-cookies', 200, 'page with cookies', '{}']
     ]);
 };

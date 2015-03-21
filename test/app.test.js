@@ -1,6 +1,6 @@
 var vows = require('vows'),
     assert = require('assert'),
-    bem = require('bem').api,
+    bem = require('bem').api,//jshint ignore: line
     spawn = require('child_process').spawn,
     constants = require('./constants'),
     bemServerProcess,
@@ -8,7 +8,8 @@ var vows = require('vows'),
     phantom = {
         phantom: require('phantom')
     },
-    client = require('./client');
+    client = require('./client'),
+    testServer = require('../test-apps/test-server/test-server').server;
 
 process.on('uncaughtException', function (err) {
     console.log('caught exception: ' + err.stack);
@@ -122,6 +123,9 @@ process.on('uncaughtException', function (err) {
                 client: client.getThirdConfig(paths, phantom)
             })
             .addBatch({
+                client: client.getFourthConfig(paths, phantom)
+            })
+            .addBatch({
                 end: {
                     'kill the servers': function () {
                         phantom.instance.exit();
@@ -132,4 +136,10 @@ process.on('uncaughtException', function (err) {
             });
     });
 
-
+module.exports['cleanup'] = vows.describe('cleanup').addBatch({
+    'test server': {
+        kill: function () {
+            testServer.close();
+        }
+    }
+});

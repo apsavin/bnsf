@@ -6,3 +6,7 @@
   path: /desktop.bundles/index/_index.{tech}
   host: localhost:8080
   requirements: {tech: js|css}
+
+- id: route_with_cookies
+  path: /
+  host: localhost:8081

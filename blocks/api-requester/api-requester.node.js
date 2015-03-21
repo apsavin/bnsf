@@ -23,6 +23,30 @@ modules.define('api-requester', [
         },
 
         /**
+         * @param {string} host
+         * @returns {{host: string, cookies: Array.<string>}}
+         * @protected
+         */
+        _getCookieStorageForHost: function (host) {
+            var cookieStorage = this.params.cookieStorage;
+            var cookiesForHosts = cookieStorage.cookies = cookieStorage.cookies || [],
+                cookiesForHost;
+
+            for (var i = 0; i < cookiesForHosts.length; i++) {
+                cookiesForHost = cookiesForHosts[i];
+                if (cookiesForHost.host === host) {
+                    return cookiesForHost;
+                }
+            }
+            cookiesForHost = {
+                host: host,
+                cookies: []
+            };
+            cookiesForHosts.push(cookiesForHost);
+            return cookiesForHost;
+        },
+
+        /**
          * @param {String} method
          * @param {String} [route]
          * @param {?Object} [routeParameters]
@@ -34,14 +58,13 @@ modules.define('api-requester', [
                 deferred = Vow.defer(),
                 parsedUrl = URL.parse(url),
                 _this = this,
-                cookieStorage = this.params.cookieStorage,
-                cookieId = parsedUrl.protocol + parsedUrl.host;
-
-            cookieStorage.cookies = cookieStorage.cookies || {};
+                cookieStorage = this._getCookieStorageForHost(parsedUrl.host);
 
             var jar = request.jar();
-            if (cookieStorage.cookies[cookieId]) {
-                jar.setCookie(cookieStorage.cookies[cookieId], url);
+            if (cookieStorage.cookies.length) {
+                cookieStorage.cookies.forEach(function (cookie) {
+                    jar.setCookie(cookie, url);
+                });
             }
 
             var requestCallback = function (err, res, body) {
@@ -60,7 +83,9 @@ modules.define('api-requester', [
                     body: parsedBody
                 };
                 if (res) {
-                    cookieStorage.cookies[cookieId] = jar.getCookieString(url);
+                    cookieStorage.cookies = jar.getCookies(url).map(function (cookie) {
+                        return cookie.toString();
+                    });
                     output.response = {
                         statusCode: res.statusCode,
                         statusText: res.statusText

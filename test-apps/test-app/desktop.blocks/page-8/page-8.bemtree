@@ -1,0 +1,16 @@
+block('page-8')(
+    elem('title').content()('page with cookies'),
+    content()(function () {
+        return this.get('route_with_cookies', function (response) {
+            return [
+                {
+                    block: 'link',
+                    url: path('page-1'),
+                    content: 'main page'
+                },
+                JSON.stringify(response.body)
+            ];
+        });
+    })
+);
+

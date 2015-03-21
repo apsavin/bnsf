@@ -397,3 +397,28 @@ exports.getThirdConfig = function (paths, phantomConfig) {
         }
     });
 };
+
+exports.getFourthConfig = function (paths, phantomConfig) {
+    phantomHelpers.config = phantomConfig;
+    return prepareMainPage({
+        'first navigation to page with cookies': checkNavigation('/page-with-cookies', 200, {
+            content: checkContent('{}', {
+                'navigation back to main page': checkNavigation('/', 200, {
+                    title: checkTitle('main page', {
+                        'second navigation to page with cookies': checkNavigation('/page-with-cookies', 200, {
+                            content: checkContent('{"a":"1","b":"1"}', {
+                                'navigation back to main page': checkNavigation('/', 200, {
+                                    title: checkTitle('main page', {
+                                        'third navigation to page with cookies': checkNavigation('/page-with-cookies', 200, {
+                                            content: checkContent('{"a":"2","b":"2"}')
+                                        })
+                                    })
+                                })
+                            })
+                        })
+                    })
+                })
+            })
+        })
+    });
+};

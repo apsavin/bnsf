@@ -17,5 +17,6 @@ exports.blocks = [
     {name: 'page-4'},
     {name: 'page-5'},
     {name: 'page-6'},
-    {name: 'page-7'}
+    {name: 'page-7'},
+    {name: 'page-8'}
 ];
