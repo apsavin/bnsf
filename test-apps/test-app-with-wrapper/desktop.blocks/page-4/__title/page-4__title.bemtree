@@ -1,1 +1,0 @@
-block('page-4').elem('title').content()('dynamic page with get params');

@@ -1,9 +1,0 @@
-block('page-2').content()(function () {
-    return [
-        {
-            block: 'link',
-            url: path('page-1'),
-            content: 'main page'
-        }
-    ];
-});

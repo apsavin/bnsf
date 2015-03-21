@@ -1,1 +1,0 @@
-block('page-3').elem('title').content()('dynamic page');

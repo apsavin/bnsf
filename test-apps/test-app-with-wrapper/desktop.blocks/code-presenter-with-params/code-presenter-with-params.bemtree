@@ -1,5 +1,0 @@
-block('code-presenter-with-params').content()(function () {
-    return this.get('some_api_route_with_params', {tech: this.route.parameters.tech || 'js'}, function (output) {
-        return output.body;
-    });
-});

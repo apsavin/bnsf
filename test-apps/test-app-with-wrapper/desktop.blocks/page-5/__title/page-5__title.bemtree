@@ -1,1 +1,0 @@
-block('page-5').elem('title').content()('page with redirect');
