@@ -41,7 +41,7 @@ oninit(function (exports, context) {
             onFulfilled = routeParams;
             routeParams = undef;
         }
-        var promiseKey = route + routeParams ? JSON.stringify(routeParams) : '',
+        var promiseKey = route + (routeParams ? JSON.stringify(routeParams) : ''),
             promises = this._promises,
             promise = promises[promiseKey] = promises[promiseKey] || this._apiRequester.get(route, routeParams);
         return this.doAsync(promise, onFulfilled, onRejected, this);
