@@ -27,3 +27,6 @@
 
 - id: page-8
   path: /page-with-cookies
+
+- id: page-9
+  path: /page-with-several-requests-in-block

@@ -1,0 +1,15 @@
+block('page-9')(
+    elem('title').content()('page with several requests in block'),
+    content()(function () {
+        return this.doAsync(Vow.all([
+            this.get('route_is_first', { a: 1 }),
+            this.get('route_is_first', { a: 2 }),
+            this.get('route_2', { a: 1 })
+        ]), function (answers) {
+            return answers.map(function (response) {
+                return response.body;
+            }).join('');
+        });
+    })
+);
+

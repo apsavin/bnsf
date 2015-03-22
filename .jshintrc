@@ -16,9 +16,12 @@
         "attrs",
         "js",
         "bem",
+        "def",
         "match",
+        "apply",
         "applyNext",
         "applyCtx",
+        "Vow",
         // for bemtree
         "path",
         "get",

@@ -20,6 +20,7 @@ module.exports.getConfig = function (paths) {
                 }])
             }
         },
-        ['/page-with-cookies', 200, 'page with cookies', '{}']
+        ['/page-with-cookies', 200, 'page with cookies', '{}'],
+        ['/page-with-several-requests-in-block', 200, 'page with several requests in block', '112']
     ]);
 };

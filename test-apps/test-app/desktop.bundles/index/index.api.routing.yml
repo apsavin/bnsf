@@ -10,3 +10,11 @@
 - id: route_with_cookies
   path: /
   host: localhost:8081
+
+- id: route_is_first
+  path: /is-first
+  host: localhost:8081
+
+- id: route_2
+  path: /2
+  host: localhost:8081
