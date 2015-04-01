@@ -227,7 +227,7 @@ exports.techMixin = {
 
         return Vow.allResolved(promises).then(function (result) {
             var configs = result.map(function (promise) {
-                return promise.isRejected() ? {} : yml.safeLoad(promise.valueOf());
+                return promise.isRejected() ? {} : (yml.safeLoad(promise.valueOf()) || {});
             });
             config = defaults(configs[1], configs[0]);
             return config;
