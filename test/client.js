@@ -171,6 +171,45 @@ var assert = require('assert'),
     },
 
     /**
+     * @param {string} path
+     * @param {number} time ms, max time to wait
+     * @param {string} currentPath
+     * @param {object} config for vows
+     * @returns {object} config for vows
+     */
+    checkPreventedNavigation = function (path, time, currentPath, config) {
+        var random = Math.random(),
+            output = {
+                topic: function () {
+                    startNavigation({ path: path, random: random }, this.callback);
+                }
+            };
+        output['should find the link to ' + path] = function (answers) {
+            assert.ok(answers[0]);
+        };
+        config.topic = function () {
+            var callback = this.callback;
+            setTimeout(function () {
+                var expectedResult = 'http://localhost:3000' + currentPath;
+                phantomHelpers.config.page.evaluate(function () {
+                    return {
+                        test: location.href.toString(),
+                        data: window.reloadTest
+                    };
+                }, function (response) {
+                    if (expectedResult === response.test) {
+                        return callback(null, response);
+                    }
+                    callback(new Error('Expected ' + expectedResult + ' got ' + response.test));
+                });
+            }, time);
+        };
+        config['should not reload page'] = assertPageNavigationEnd(random);
+        output['wait for url ' + currentPath] = config;
+        return output;
+    },
+
+    /**
      * @param {string} content
      * @param {object} [config] for vows
      * @returns {object} config for vows
@@ -272,9 +311,13 @@ exports.getFirstConfig = function (paths, phantomConfig) {
                                         content: checkContent('node_modules'),
                                         'navigation back to main page': checkNavigation('/', 200, {
                                             title: checkTitle('main page', {
-                                                'navigation to dynamic page with css param': checkNavigation('/dynamic-page-with-params?tech=css', 1000, {
-                                                    title: checkTitle('404 not found'),
-                                                    content: checkContent('404 not found')
+                                                'navigation to js link': checkPreventedNavigation('/page-that-not-exists#js-link', 200, '/', {
+                                                    title: checkTitle('main page', {
+                                                        'navigation to dynamic page with css param': checkNavigation('/dynamic-page-with-params?tech=css', 1000, {
+                                                            title: checkTitle('404 not found'),
+                                                            content: checkContent('404 not found')
+                                                        })
+                                                    })
                                                 })
                                             })
                                         })

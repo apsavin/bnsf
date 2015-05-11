@@ -39,6 +39,14 @@ block('page-1').content()(function () {
             block: 'link',
             url: path('page-8'),
             content: 'page with cookies'
+        },
+        {
+            block: 'link',
+            js: {
+                preventDefault: true
+            },
+            url: '/page-that-not-exists#js-link',
+            content: 'page that not exists'
         }
     ];
 });

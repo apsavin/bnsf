@@ -15,8 +15,10 @@ modules.define('request-listener', ['jquery', 'app-navigation'], function (provi
         _initListener: function () {
             var _this = this;
             $(document).on('click', 'a', function (e) {
-                if (!e.metaKey && !e.ctrlKey && this.protocol === location.protocol &&
-                    this.host === location.host && !this.attributes.target) {
+                if (!e.metaKey && !e.ctrlKey && !e.isDefaultPrevented() &&
+                    this.protocol === location.protocol &&
+                    this.host === location.host &&
+                    !this.attributes.target) {
                     e.preventDefault();
 
                     // we should correct pathname because of IE lte 9
