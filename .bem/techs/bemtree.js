@@ -7,6 +7,11 @@ exports.baseTechPath = PATH.resolve(BEMCORE_TECHS, 'bemtree.js');
 
 exports.techMixin = {
 
+    /**
+     * todo: remove after https://github.com/bem/bem-xjst/issues/41
+     * @param {Array.<string>} sources
+     * @returns {string}
+     */
     getCompiledResult: function (sources) {
         sources = sources.join('\n');
 
@@ -20,19 +25,38 @@ exports.techMixin = {
                 cache: optimize && process.env[exportName + '_CACHE'] === 'on'
             });
 
+        var deps = this.getModulesDeps(),
+            modulesDeps = deps ? ', ' + JSON.stringify(Object.keys(deps)) : '',
+            modulesProvidedDeps = deps ? ', ' + Object.keys(deps).map(function (module) {
+                var providedName = deps[module];
+                return providedName === true ? module : providedName;
+            }).join(', ') : '';
+
         return '(function(g) {\n' +
-            "  modules.define('" + exportName + "', ['vow', 'app-router-base'], function(provide, Vow, router) { \n" +
-            '  var path = router.generate.bind(router),\n'+
-            '      redirect = function (path) {\n'+
-            '          var error = new Error("Redirect needed");error.path = path;error.redirect = true;\n'+
-            '          throw error;\n'+
-            '      };\n'+
-            '  var __bem_xjst = (function(exports) {\n' +
+            '  var __bem_xjst = function(exports' + modulesProvidedDeps + ') {\n' +
             '     ' + code + ';\n' +
             '     return exports;\n' +
-            '  })({});\n' +
-            "  provide(__bem_xjst); \n" +
-            "});\n" +
+            '  }\n' +
+            '  var defineAsGlobal = true;\n' +
+            '  if(typeof modules === "object") {\n' +
+            '    modules.define("' + exportName + '"' + modulesDeps + ',\n' +
+            '      function(provide' + modulesProvidedDeps + ') {\n' +
+            '        provide(__bem_xjst({}' + modulesProvidedDeps + ')) });\n' +
+            '    defineAsGlobal = false;\n' +
+            '  }\n' +
+            '  else if(typeof exports === "object") {\n' +
+            '    exports["' + exportName + '"] = __bem_xjst({}' + modulesProvidedDeps + ');\n' +
+            '    defineAsGlobal = false;\n' +
+            '  }\n' +
+            '  defineAsGlobal && (g["' + exportName + '"] = __bem_xjst({}' + modulesProvidedDeps + '));\n' +
             '})(this);';
+    },
+
+    getModulesDeps: function () {
+        return {
+            'vow': 'Vow',
+            'bemtree-extensions__path': 'path',
+            'bemtree-extensions__redirect': 'redirect'
+        };
     }
 };
