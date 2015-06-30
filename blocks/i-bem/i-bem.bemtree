@@ -52,7 +52,7 @@ oninit(function (exports, context) {
      * @param {Function} [onFulfilled]
      * @param {Function} [onRejected]
      * @param {Object} [context]
-     * @returns {vow:Promise}
+     * @returns {Promise}
      */
     BEMContext.prototype.doAsync = function doAsync (fn, onFulfilled, onRejected, context) {
         if (onFulfilled && !isFunction(onFulfilled)) {
@@ -101,14 +101,48 @@ oninit(function (exports, context) {
     };
 
     var oldApply = context.xjstApply;
+
+    /**
+     * removes promises from bemjson
+     * todo: remove when https://github.com/bem/bem-core/issues/884 will be closed
+     * @param {*} bemjson
+     * @returns {*} bemjson
+     */
+    var convertPromisesToBemjson = function (bemjson) {
+        var i;
+        if (Vow.isPromise(bemjson)) {
+            bemjson = convertPromisesToBemjson(bemjson.valueOf());
+        } else if (Array.isArray(bemjson)) {
+            for (i = 0; i < bemjson.length; i++) {
+                bemjson[i] = convertPromisesToBemjson(bemjson[i]);
+            }
+        } else if (typeof bemjson === 'object') {
+            for (i in bemjson) {
+                if (bemjson.hasOwnProperty(i)) {
+                    bemjson[i] = convertPromisesToBemjson(bemjson[i]);
+                }
+            }
+        }
+        return bemjson;
+    };
+
+    /**
+     * waits for all, even nested, promises inside bemtree
+     * @param ctx
+     * @returns {Promise}
+     */
+    var waitForPromises = function (ctx) {
+        var promise = Vow.all(ctx.__queue);
+        ctx.__queue = [];
+        return promise.then(function () {
+            return ctx.__queue.length ? waitForPromises(ctx) : convertPromisesToBemjson(ctx._buf);
+        });
+    };
+
     exports.apply = BEMContext.applyAsync = function BEMContext_applyAsync (context, apiRequester) {
         var ctx = new BEMContext(context || this, oldApply, apiRequester);
         ctx._buf = ctx.apply();
-        return Vow
-            .all(ctx.__queue)
-            .then(function () {
-                return ctx._buf;
-            });
+        return waitForPromises(ctx);
     };
 
     BEMContext.prototype.reapply = BEMContext.applyAsync;
