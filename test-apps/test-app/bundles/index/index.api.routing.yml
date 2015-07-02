@@ -1,0 +1,20 @@
+- id: some_api_route
+  path: /bundles/index/_index.js
+  host: localhost:8080
+
+- id: some_api_route_with_params
+  path: /bundles/index/_index.{tech}
+  host: localhost:8080
+  requirements: {tech: js|css}
+
+- id: route_with_cookies
+  path: /
+  host: localhost:8081
+
+- id: route_is_first
+  path: /is-first
+  host: localhost:8081
+
+- id: route_2
+  path: /2
+  host: localhost:8081

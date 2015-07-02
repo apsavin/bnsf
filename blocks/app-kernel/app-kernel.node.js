@@ -149,10 +149,10 @@ modules.define('app-kernel', [
                     }
                 },
                 scripts: [
-                    { elem: 'js', url: '//' + this.params.staticHost + '/desktop.bundles/index/_index.js' }
+                    { elem: 'js', url: '//' + this.params.staticHost + '/bundles/index/_index.js' }
                 ],
                 styles: [
-                    { elem: 'css', url: '//' + this.params.staticHost + '/desktop.bundles/index/_index.css' }
+                    { elem: 'css', url: '//' + this.params.staticHost + '/bundles/index/_index.css' }
                 ]
             });
         },
