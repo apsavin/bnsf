@@ -1,1 +1,0 @@
-../../../test-app/desktop.bundles/index/index.bemdecl.js

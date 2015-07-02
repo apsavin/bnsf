@@ -1,10 +1,7 @@
 var vows = require('vows'),
     assert = require('assert'),
-    bem = require('bem').api,//jshint ignore: line
     spawn = require('child_process').spawn,
     constants = require('./constants'),
-    bemServerProcess,
-    appServerProcess,
     phantom = {
         phantom: require('phantom')
     },
@@ -21,7 +18,10 @@ process.on('uncaughtException', function (err) {
     'test-app-with-history-fallback',
     'test-app-with-wrapper'
 ].forEach(function (appName) {
-        var paths = constants.getPaths(appName);
+        var enbMakeProcess,
+            enbServerProcess,
+            appServerProcess,
+            paths = constants.getPaths(appName);
         module.exports[appName] = vows.describe(appName)
             .addBatch({
                 start: {
@@ -29,35 +29,43 @@ process.on('uncaughtException', function (err) {
                         var _this = this,
                             bnsfStarted = false,
                             phantomStarted = false,
-                            bemStarted = false;
+                            enbServerStarted = false;
 
-                        bem.make({
-                            root: paths.TEST_APP_DIR
-                        }).then(function () {
-                            console.log('bem make finished successfully');
-                            bemServerProcess = spawn('node', [
-                                paths.BEM,
-                                'server',
-                                '-r',
-                                paths.TEST_APP_DIR
-                            ]);
-                            bemServerProcess.on('error', function (err) {
+                        enbMakeProcess = spawn('node', [
+                            paths.ENB,
+                            'make'
+                        ], {
+                            cwd: paths.TEST_APP_DIR
+                        });
+                        enbMakeProcess.on('close', function (code) {
+                            if (code !== 0) {
+                                console.log('enb make process exited with code ' + code);
+                                process.exit(1);
+                                return;
+                            }
+                            console.log('enb make finished successfully');
+                            enbServerProcess = spawn('node', [
+                                paths.ENB,
+                                'server'
+                            ], {
+                                cwd: paths.TEST_APP_DIR
+                            });
+                            enbServerProcess.on('error', function (err) {
                                 console.log(err);
                                 process.exit(1);
                             });
-                            bemServerProcess.stderr.on('data', function (data) {
-                                console.log('bem server stderr' + data);
+                            enbServerProcess.stderr.on('data', function (data) {
+                                console.log('enb server stderr' + data);
                             });
-                            bemServerProcess.stdout.on('data', function onData (data) {
+                            enbServerProcess.stdout.on('data', function onData (data) {
                                 data = data.toString();
                                 console.log(data);
-                                if (/Server is listening/.test(data)) {
-                                    bemServerProcess.stdout.removeListener('data', onData);
-                                    console.log('bem server started');
+                                if (/Server started/.test(data)) {
+                                    enbServerProcess.stdout.removeListener('data', onData);
                                     if (phantomStarted && bnsfStarted) {
                                         _this.callback();
                                     }
-                                    bemStarted = true;
+                                    enbServerStarted = true;
                                 }
                             });
                             appServerProcess = spawn('node', [
@@ -76,15 +84,15 @@ process.on('uncaughtException', function (err) {
                                 if (/server started/.test(data)) {
                                     console.log('app server started');
                                     appServerProcess.stdout.removeListener('data', onData);
-                                    if (phantomStarted && bemStarted) {
+                                    if (phantomStarted && enbServerStarted) {
                                         _this.callback();
                                     }
                                     bnsfStarted = true;
                                 }
                             });
-                        }, function (err) {
-                            console.log(err);
-                            process.exit(1);
+                        });
+                        enbMakeProcess.stderr.on('data', function (data) {
+                            console.log('enb make stderr ' + data);
                         });
 
                         phantom.phantom.create({
@@ -97,7 +105,7 @@ process.on('uncaughtException', function (err) {
                                 phantom.page = page;
                                 console.log('phantom started');
                                 page.onConsoleMessage(function (msg) {console.log('PHANTOM ' + msg); });
-                                if (bnsfStarted && bemStarted) {
+                                if (bnsfStarted && enbServerStarted) {
                                     _this.callback();
                                 }
                                 phantomStarted = true;
@@ -130,7 +138,7 @@ process.on('uncaughtException', function (err) {
                     'kill the servers': function () {
                         phantom.instance.exit();
                         appServerProcess.kill();
-                        bemServerProcess.kill();
+                        enbServerProcess.kill();
                     }
                 }
             });

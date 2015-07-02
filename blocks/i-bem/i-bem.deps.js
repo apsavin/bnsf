@@ -1,5 +1,5 @@
 ({
-    mustDeps: [
+    shouldDeps: [
         {
             block: 'bemtree-extensions',
             elems: [

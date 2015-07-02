@@ -1,8 +1,8 @@
 ({
     mustDeps: [
-        {block: 'i-bem'}
+        'i-bem'
     ],
     shouldDeps: [
-        'history', 'app-router-base'
+        'jquery', 'history', 'app-router-base'
     ]
 })

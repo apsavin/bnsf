@@ -1,0 +1,27 @@
+- host: localhost:8080
+  prefix: /bundles/index
+  routes:
+    - id: some_api_route
+      path: /_index.js
+
+    - id: some_api_route_with_params
+      path: /_index.{tech}
+      requirements: {tech: js|css}
+
+- host: localhost:8081
+  routes:
+    - id: route_with_cookies
+      path: /
+
+    - id: route_is_first
+      path: /is-first
+
+    - id: route_2
+      path: /2
+
+    - id: correct_post
+      path: /correct-post
+
+    - id: error_post
+      path: /error-post/{error}
+      requirement: {error: \d\d\d}
