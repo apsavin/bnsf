@@ -47,6 +47,9 @@ block('page-1').content()(function () {
             },
             url: '/page-that-not-exists#js-link',
             content: 'page that not exists'
+        },
+        {
+            block: 'requests-tester'
         }
     ];
 });

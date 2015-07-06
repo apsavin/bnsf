@@ -34,7 +34,7 @@ var assert = require('assert'),
         waitFor: function (fn, answer, time, callback, argument) {
             var WAIT_STEP = this._WAIT_STEP;
             phantomHelpers.config.page.evaluate(fn, function (response) {
-                var answerToCheck = response.test || response;
+                var answerToCheck = response ? response.test || response : response;
                 if (answerToCheck === answer) {
                     callback(null, response);
                 } else if (!time) {
@@ -392,7 +392,40 @@ exports.getSecondConfig = function (paths, phantomConfig) {
                         random: Math.random()
                     }, {
                         'navigation back to main page': checkNavigation('/', 200, {
-                            title: checkTitle('main page')
+                            title: checkTitle('main page', {
+                                'post requests': {
+                                    topic: function () {
+                                        var callback = this.callback;
+                                        phantomHelpers.evaluate([function () {
+                                            var $button;
+                                            try {
+                                                $button = window.$('button').click();
+                                            } catch (e) {
+                                                throw e;
+                                            }
+                                            return $button.length;
+                                        }], function () {
+                                            phantomHelpers.waitFor(function () {
+                                                var bodyContent = document.getElementsByTagName('body')[0].innerHTML;
+                                                return [
+                                                    'correct_post-1',
+                                                    'correct_post-2',
+                                                    'correct_post-3',
+                                                    'error-post-400',
+                                                    'error-post-500'
+                                                ].every(function (content) {
+                                                        var regExp = new RegExp(content, 'g');
+                                                        return regExp.test(bodyContent);
+                                                    });
+                                            }, true, 100, callback);
+                                        });
+                                    },
+                                    'should send requests and get responses': function (err, answer) {
+                                        assert.equal(err, null);
+                                        assert.equal(answer, true);
+                                    }
+                                }
+                            })
                         })
                     })))
                 }

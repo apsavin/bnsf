@@ -1,0 +1,12 @@
+block('requests-tester')(
+    content()(function () {
+        return [
+            {
+                elem: 'button'
+            },
+            {
+                elem: 'results-holder'
+            }
+        ];
+    })
+);

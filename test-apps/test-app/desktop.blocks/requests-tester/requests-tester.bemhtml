@@ -1,0 +1,6 @@
+block('requests-tester')(
+    js()(true),
+    elem('button')(
+        tag()('button')
+    )
+);

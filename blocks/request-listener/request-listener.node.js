@@ -18,7 +18,7 @@ modules.define('request-listener', ['app-logger'], function (provide, logger, Re
         _getMiddleware: function () {
             var bodyParser = require('body-parser');
             return require('connect')()
-                .use(bodyParser.urlencoded({ extended: false }))
+                .use(bodyParser.urlencoded({ extended: true }))
                 .use(bodyParser.json())
                 .use(require('express-session')(this._getSessionParams()));
         },
