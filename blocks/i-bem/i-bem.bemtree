@@ -82,16 +82,15 @@ oninit(function (exports, context) {
             promise = isFunction(fn) ? Vow.invoke(fn, context) : fn;
 
         if (onFulfilled) {
+            promise = promise.then(function (response) {
+                restore();
+                return onFulfilled.call(this, response);
+            }, this);
             if (onRejected) {
-                promise = promise.then(function (response) {
-                    restore();
-                    return onFulfilled.call(this, response);
-                }, function (response) {
+                promise = promise.fail(function (response) {
                     restore();
                     return onRejected.call(this, response);
                 }, context);
-            } else {
-                promise = promise.then(restore).then(onFulfilled, context);
             }
         }
 
