@@ -19,14 +19,24 @@ module.exports = require('enb/lib/build-flow').create()
     .name('node-js-with-sources')
     .target('target', '?.node.js')
     .useFileList(['vanilla.js', 'node.js'])
-    .defineRequiredOption('sources')
-    .useSourceListFilenames('sources')
-    .builder(function (sourceFiles, sources) {
-        sourceFiles = sources ? sourceFiles.concat(sources.map(function (source) {
+    .defineOption('before')
+    .useSourceListFilenames('before')
+    .defineOption('after')
+    .useSourceListFilenames('after')
+    .builder(function (sourceFiles, before, after) {
+        var getSourceFileDescription = function (name) {
             return {
-                fullname: source
+                fullname: name
             };
-        })) : sourceFiles;
+        };
+
+        if (before) {
+            Array.prototype.unshift.apply(sourceFiles, before.map(getSourceFileDescription));
+        }
+
+        if (after) {
+            Array.prototype.push.apply(sourceFiles, after.map(getSourceFileDescription));
+        }
 
         var node = this.node,
             dropRequireCacheFunc = [
