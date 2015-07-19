@@ -91,11 +91,13 @@ module.exports = function (additionalLevels) {
                 // node js
                 [techs.nodeJsWithSources, {
                     target: '?.pre.node.js',
-                    sources: [
+                    before: [
+                        '?.config.node.js'
+                    ],
+                    after: [
                         '?.bemhtml.js', '?.bemtree.js',
                         '?.pages.node.js', '?.controllers.node.js',
-                        '?.routes.js', '?.routes-private.js',
-                        '?.config.node.js'
+                        '?.routes.js', '?.routes-private.js'
                     ]
                 }],
                 [techs.prependYm, { source: '?.pre.node.js', target: '?.node.js' }],
