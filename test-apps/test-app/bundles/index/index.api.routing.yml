@@ -1,4 +1,4 @@
-- host: localhost:8080
+- host: %api_bem_server_host%
   prefix: /bundles/index
   routes:
     - id: some_api_route
@@ -8,7 +8,7 @@
       path: /_index.{tech}
       requirements: {tech: js|css}
 
-- host: localhost:8081
+- host: %api_server_host%
   routes:
     - id: route_with_cookies
       path: /

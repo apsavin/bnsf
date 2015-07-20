@@ -1,0 +1,4 @@
+api_server_host: localhost:8081
+api_bem_server_host: localhost:8080
+page_3_path: dynamic-page
+port: 3000

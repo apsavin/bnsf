@@ -11,11 +11,9 @@
  * nodeConfig.addTech([ require('path/to/parameters') ]);
  * ```
  */
-var Vow = require('vow'),
-    VowFs = require('vow-fs'),
+var vowFs = require('vow-fs'),
     inherit = require('inherit'),
-    yml = require('js-yaml'),
-    defaults = require('lodash.defaults');
+    yml = require('js-yaml');
 
 module.exports = inherit(require('enb/lib/tech/base-tech'), {
     getName: function () {
@@ -40,26 +38,18 @@ module.exports = inherit(require('enb/lib/tech/base-tech'), {
     },
 
     build: function () {
-        var target = this.node.unmaskTargetName(this._target);
-        var targetPath = this.node.resolvePath(target);
-        var sourceParameters = '?.parameters.yml';
-        var sourceParametersDist = '?.parameters.dist.yml';
-        var promises = [
-            this._getSourcePathByMask(sourceParametersDist),
-            this._getSourcePathByMask(sourceParameters)
-        ].map(function (path) {
-                return VowFs.read(path, 'utf8');
-            });
+        var target = this.node.unmaskTargetName(this._target),
+            targetPath = this.node.resolvePath(target),
+            sourceParameters = '?.parameters.dist.yml';
 
-        return Vow.allResolved(promises)
-            .then(function (result) {
-                var parameters = result.map(function (promise) {
-                    return promise.isRejected() ? {} : (yml.safeLoad(promise.valueOf()) || {});
-                });
-                return 'module.exports=' + JSON.stringify(defaults(parameters[1], parameters[0])) + ';';
-            }, this)
+        return vowFs.read(this._getSourcePathByMask(sourceParameters), 'utf8')
             .then(function (content) {
-                return VowFs.write(targetPath, content);
+                return yml.safeLoad(content) || {};
+            }, function () {
+                return {};
+            }, this)
+            .then(function (result) {
+                return vowFs.write(targetPath, 'module.exports=' + JSON.stringify(result) + ';');
             })
             .then(function () {
                 this.node.resolveTarget(target);
