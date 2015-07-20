@@ -21,20 +21,34 @@ module.exports = require('./yml-source-reader')
         return this._build(parametersFilePath, this.node.resolvePath(this.node.unmaskTargetName('?.config.node.yml')));
     })
     .methods({
+
         /**
-         * @param {object} content
+         * @returns {string}
+         * @private
+         */
+        _getParametersPathsModule: function () {
+            return this._getJSONModuleDefinition('parameters__paths', [
+                this._parametersFilePath.replace('.js', '.yml'),
+                this._parametersFilePath.replace('.js', '.dist.yml')
+            ]);
+        },
+
+        /**
+         * @param {object} result
          * @returns {string}
          * @protected
          */
-        _buildResultString: function (content) {
+        _buildResultString: function (result) {
+            var output = this._getParametersPathsModule(),
+                content = result.content;
+
             if (!content) {
-                content = {};
+                return output;
             }
 
-            var output = '';
             for (var key in content) {
                 if (content.hasOwnProperty(key)) {
-                    output += this._getJSONModuleDefinition(key + '__config', content[key]) + "\n";
+                    output += this._getConfigModuleDefinition(key + '__config', content[key]) + "\n";
                 }
             }
             return output;
@@ -47,7 +61,7 @@ module.exports = require('./yml-source-reader')
         _processError: function (err) {
             // we can just ignore case if file is not exists
             if (err.code === 'ENOENT') {
-                return '';
+                return this._getParametersPathsModule();
             }
             throw err;
         }

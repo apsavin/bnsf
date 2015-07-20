@@ -1,20 +1,20 @@
-- id: some_api_route
-  path: /bundles/index/_index.js
-  host: localhost:8080
+- host: %api_bem_server_host%
+  prefix: /bundles/index
+  routes:
+    - id: some_api_route
+      path: /_index.js
 
-- id: some_api_route_with_params
-  path: /bundles/index/_index.{tech}
-  host: localhost:8080
-  requirements: {tech: js|css}
+    - id: some_api_route_with_params
+      path: /_index.{tech}
+      requirements: {tech: js|css}
 
-- id: route_with_cookies
-  path: /
-  host: localhost:8081
+- host: %api_server_host%
+  routes:
+    - id: route_with_cookies
+      path: /
 
-- id: route_is_first
-  path: /is-first
-  host: localhost:8081
+    - id: route_is_first
+      path: /is-first
 
-- id: route_2
-  path: /2
-  host: localhost:8081
+    - id: route_2
+      path: /2

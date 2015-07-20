@@ -1,7 +1,7 @@
 /**@module app-kernel*/
 modules.define('app-kernel', [
-    'i-bem', 'controllers', 'app-api-router', 'api-requester', 'objects', 'app-kernel__config'
-], function (provide, BEM, controllers, router, ApiRequester, objects, config, appDecl) {
+    'i-bem', 'controllers', 'app-api-router', 'api-requester', 'objects', 'app-kernel__config', 'parameters'
+], function (provide, BEM, controllers, router, ApiRequester, objects, config, parameters, appDecl) {
     "use strict";
 
     /**
@@ -147,6 +147,9 @@ modules.define('app-kernel', [
                     js: {
                         currentPage: Page.getName()
                     }
+                },
+                attrs: {
+                    'data-parameters': JSON.stringify(parameters.getPublicParameters())
                 },
                 scripts: [
                     { elem: 'js', url: '//' + this.params.staticHost + '/bundles/index/_index.js' }
