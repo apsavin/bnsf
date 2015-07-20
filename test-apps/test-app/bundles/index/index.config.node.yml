@@ -1,0 +1,2 @@
+app-kernel:
+  port: %port%

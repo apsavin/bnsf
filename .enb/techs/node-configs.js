@@ -14,6 +14,8 @@
  * nodeConfig.addTech(require('path/to/node-configs', {source: '?.config.node.yml'}));
  * ```
  */
+var path = require('path');
+
 module.exports = require('./yml-source-reader')
     .name('node-configs')
     .target('target', '?.config.node.js')
@@ -21,20 +23,35 @@ module.exports = require('./yml-source-reader')
         return this._build(parametersFilePath, this.node.resolvePath(this.node.unmaskTargetName('?.config.node.yml')));
     })
     .methods({
+
         /**
-         * @param {object} content
+         * @returns {string}
+         * @private
+         */
+        _getParametersPathsModule: function () {
+            var fileName = path.basename(this._parametersFilePath);
+            return this._getJSONModuleDefinition('parameters__files-names', [
+                fileName.replace('.js', '.dist.yml'),
+                fileName.replace('.js', '.yml')
+            ]);
+        },
+
+        /**
+         * @param {object} result
          * @returns {string}
          * @protected
          */
-        _buildResultString: function (content) {
+        _buildResultString: function (result) {
+            var output = this._getParametersPathsModule(),
+                content = result.content;
+
             if (!content) {
-                content = {};
+                return output;
             }
 
-            var output = '';
             for (var key in content) {
                 if (content.hasOwnProperty(key)) {
-                    output += this._getJSONModuleDefinition(key + '__config', content[key]) + "\n";
+                    output += this._getConfigModuleDefinition(key + '__config', content[key]) + "\n";
                 }
             }
             return output;
@@ -47,7 +64,7 @@ module.exports = require('./yml-source-reader')
         _processError: function (err) {
             // we can just ignore case if file is not exists
             if (err.code === 'ENOENT') {
-                return '';
+                return this._getParametersPathsModule();
             }
             throw err;
         }

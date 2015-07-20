@@ -11,7 +11,7 @@
   requirements: {format: json|html}
 
 - id: page-3
-  path: /dynamic-page
+  path: /%page_3_path%
 
 - id: page-4
   path: /dynamic-page-with-params

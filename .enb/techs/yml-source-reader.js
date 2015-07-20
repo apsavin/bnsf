@@ -10,13 +10,14 @@
  */
 
 var yml = require('js-yaml'),
-    VowFs = require('vow-fs'),
+    vowFs = require('vow-fs'),
     PATH = require('path');
 
 module.exports = require('./base-for-techs-with-modules')
     .useSourceFilename('parameters', '?.parameters.js')
     .methods({
         _build: function (parametersFilePath, sourceFilePath) {
+            this._parametersFilePath = parametersFilePath;
             return this._readYmlFileAndReplacePlaceholders(sourceFilePath, require(parametersFilePath))
                 .then(this._buildResultString, this)
                 .fail(this._processError, this);
@@ -29,11 +30,25 @@ module.exports = require('./base-for-techs-with-modules')
          * @protected
          */
         _readYmlFileAndReplacePlaceholders: function (path, parameters) {
-            return VowFs.read(path, 'utf8').then(function (content) {
-                for (var key in parameters) {
-                    if (parameters.hasOwnProperty(key)) {
-                        content = content.replace(new RegExp('%' + key + '%', 'g'), parameters[key]);
-                    }
+            return vowFs.read(path, 'utf8').then(function (content) {
+                var parametersInUse = {},
+                    parametersNames = Object.keys(parameters),
+                    namesWithPercentsToNames = {},
+                    placeholders;
+
+                placeholders = parametersNames.map(function (parameterName) {
+                    var placeholder = '%' + parameterName + '%';
+                    namesWithPercentsToNames[placeholder] = parameterName;
+                    return placeholder;
+                });
+
+                if (placeholders.length) {
+                    // we need this replace because % is reserved symbol in yml
+                    content = content.replace(new RegExp(placeholders.join('|'), 'g'), function (match) {
+                        var key = namesWithPercentsToNames[match];
+                        parametersInUse[key] = parameters[key];
+                        return 's' + match + 's';
+                    });
                 }
 
                 var res;
@@ -44,17 +59,33 @@ module.exports = require('./base-for-techs-with-modules')
                         .logErrorAction('parsing yml failed', PATH.basename(path), '\n' + e.toString());
                     throw e;
                 }
-                return res;
+                return { content: res, parameters: parametersInUse };
             }, this);
         },
 
         /**
-         * @param {string} content
+         * @param {string} moduleName
+         * @param {*} content
+         * @returns {string}
+         * @private
+         */
+        _getConfigModuleDefinition: function (moduleName, content) {
+            return "modules.define('" + moduleName + "', [" +
+                "'parameters'" +
+                "], function(provide, parameters){" +
+                "provide(parameters.apply(" +
+                    // double JSON.stringify because we need a string
+                JSON.stringify(JSON.stringify(content)) +
+                "));});\n";
+        },
+
+        /**
+         * @param {{content: *, parameters: object}} result
          * @returns {string}
          * @protected
          */
-        _buildResultString: function (content) {
-            return content;
+        _buildResultString: function (result) {
+            return result.content;
         },
 
         /**
