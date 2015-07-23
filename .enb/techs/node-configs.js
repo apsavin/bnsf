@@ -31,8 +31,8 @@ module.exports = require('./yml-source-reader')
         _getParametersPathsModule: function () {
             var fileName = path.basename(this._parametersFilePath);
             return this._getJSONModuleDefinition('parameters__files-names', [
-                fileName.replace('.js', '.yml'),
-                fileName.replace('.js', '.dist.yml')
+                fileName.replace('.js', '.dist.yml'),
+                fileName.replace('.js', '.yml')
             ]);
         },
 
