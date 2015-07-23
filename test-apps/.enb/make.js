@@ -73,6 +73,7 @@ module.exports = function (additionalLevels) {
                 [techs.routes, {
                     source: '?.api.routing.yml',
                     target: '?.routes-private.js',
+                    public: false,
                     moduleName: 'routes-private'
                 }],
                 [techs.nodeConfigs],
