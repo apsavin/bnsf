@@ -1,13 +1,15 @@
 /**@module parameters*/
 modules.define('parameters', [
-    'parameters__paths', 'parameters__public-names', 'vow', 'objects'
-], function (provide, parametersPaths, publicNames, vow, objects, parameters) {
+    'parameters__files-names', 'parameters__public-names', 'vow', 'objects'
+], function (provide, parametersFilesNames, publicNames, vow, objects, parameters) {
     "use strict";
 
     var yml = require('js-yaml'),
         vowFs = require('vow-fs'),
-        promises = parametersPaths.map(function (path) {
-            return vowFs.read(path, 'utf8');
+        path = require('path'),
+        mainFileDirectory = path.dirname(require.main.filename),
+        promises = parametersFilesNames.map(function (fileName) {
+            return vowFs.read(path.join(mainFileDirectory, fileName), 'utf8');
         });
 
     vow.allResolved(promises)

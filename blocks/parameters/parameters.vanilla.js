@@ -45,12 +45,20 @@ modules.define('parameters', ['objects'], function (provide, objects) {
             var parameters = this._parameters,
                 placeholdersToParameters = this._placeholdersToParameters,
                 placeholdersWithQuotesToParameters = this._placeholdersWithQuotesToParameters;
-            configString = configString.replace(new RegExp(this._placeholders, 'g'), function (match) {
-                return placeholdersToParameters[match] ?
-                    parameters[placeholdersToParameters[match]] :
-                    JSON.stringify(parameters[placeholdersWithQuotesToParameters[match]]);
-            });
-            return JSON.parse(configString);
+            if (this._placeholders) {
+                configString = configString.replace(new RegExp(this._placeholders, 'g'), function (match) {
+                    return placeholdersToParameters[match] ?
+                        parameters[placeholdersToParameters[match]] :
+                        JSON.stringify(parameters[placeholdersWithQuotesToParameters[match]]);
+                });
+            }
+            var parsedConfig;
+            try {
+                parsedConfig = JSON.parse(configString);
+            } catch (e) {
+                throw new Error('Malformed config found. Please check your *.yml files and build process.');
+            }
+            return parsedConfig;
         }
     });
 });

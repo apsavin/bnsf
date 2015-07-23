@@ -14,6 +14,8 @@
  * nodeConfig.addTech(require('path/to/node-configs', {source: '?.config.node.yml'}));
  * ```
  */
+var path = require('path');
+
 module.exports = require('./yml-source-reader')
     .name('node-configs')
     .target('target', '?.config.node.js')
@@ -27,9 +29,10 @@ module.exports = require('./yml-source-reader')
          * @private
          */
         _getParametersPathsModule: function () {
-            return this._getJSONModuleDefinition('parameters__paths', [
-                this._parametersFilePath.replace('.js', '.yml'),
-                this._parametersFilePath.replace('.js', '.dist.yml')
+            var fileName = path.basename(this._parametersFilePath);
+            return this._getJSONModuleDefinition('parameters__files-names', [
+                fileName.replace('.js', '.yml'),
+                fileName.replace('.js', '.dist.yml')
             ]);
         },
 
