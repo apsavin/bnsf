@@ -74,8 +74,10 @@ modules.define('api-requester', [
                     parsedBody = _this._processBody(res, body);
                 } catch (e) {
                     logger.error('Server response on ' + method.toUpperCase() + ' ' + url + ' can not be parsed');
+                    logger.error('Server response body:');
+                    logger.error(body);
                     deferred.reject(e);
-                    return deferred.promise();
+                    return;
                 }
 
                 var output = {
