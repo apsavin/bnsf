@@ -1,14 +1,14 @@
 {
   "name": "bnsf",
-  "version": "0.5.0",
-  "description": "bnsf",
+  "version": "0.5.1",
+  "description": "bem node spa framework",
   "repository": {
     "type": "git",
     "url": "https://github.com/apsavin/bnsf.git"
   },
   "bugs": "https://github.com/apsavin/bnsf/issues",
   "ignore": [
-    ".bem/cache",
+    ".enb/tmp",
     "node_modules",
     "libs"
   ],

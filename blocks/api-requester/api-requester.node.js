@@ -73,8 +73,8 @@ modules.define('api-requester', [
                 try {
                     parsedBody = _this._processBody(res, body);
                 } catch (e) {
-                    logger.error('Server response on ' + method.toUpperCase() + ' ' + url + ' can not be parsed');
-                    logger.error('Server response body:');
+                    logger.error('API response on ' + method.toUpperCase() + ' ' + url + ' can not be parsed');
+                    logger.error('API response body:');
                     logger.error(body);
                     deferred.reject(e);
                     return;
@@ -99,7 +99,12 @@ modules.define('api-requester', [
                         output.error = output.body;
                     }
                 }
-                if (err || badStatus) {
+                if (err) {
+                    logger.error('API request ' + method.toUpperCase() + ' ' + url + ' error:');
+                    logger.error(err);
+                    deferred.reject(output);
+                } else if (badStatus) {
+                    logger.warn('API request ' + method.toUpperCase() + ' ' + url + ' has status ' + res.statusCode);
                     logger.warn(output.error);
                     deferred.reject(output);
                 } else {
