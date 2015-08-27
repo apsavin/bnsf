@@ -1,12 +1,13 @@
 /* global oninit, Vow */
-oninit(function (exports, context) {
+oninit(function (exports, initialContext) {
     var undef,
         isFunction = function (obj) {
             return typeof obj === 'function';
-        };
+        },
+        OldBEMContext = initialContext.BEMContext;
 
     function BEMContext (ctx, apply, data) {
-        context.BEMContext.call(this, ctx, apply);
+        OldBEMContext.call(this, ctx, apply);
         /**
          * @private
          */
@@ -33,7 +34,7 @@ oninit(function (exports, context) {
         this._promises = {};
     }
 
-    BEMContext.prototype = Object.create(context.BEMContext.prototype);
+    BEMContext.prototype = Object.create(OldBEMContext.prototype);
 
     BEMContext.prototype.get = function (route, routeParams, onFulfilled, onRejected) {
         if (routeParams && isFunction(routeParams)) {
@@ -99,7 +100,7 @@ oninit(function (exports, context) {
         return promise.always(restore);
     };
 
-    var oldApply = context.xjstApply;
+    var oldApply = initialContext.xjstApply;
 
     /**
      * removes promises from bemjson
@@ -138,8 +139,10 @@ oninit(function (exports, context) {
         });
     };
 
-    exports.apply = BEMContext.applyAsync = function BEMContext_applyAsync (context, apiRequester) {
-        var ctx = new BEMContext(context || this, oldApply, apiRequester);
+    initialContext.BEMContext = BEMContext;
+
+    exports.apply = BEMContext.applyAsync = function BEMContext_applyAsync (context, data) {
+        var ctx = new initialContext.BEMContext(context || this, oldApply, data);
         ctx._buf = ctx.apply();
         return waitForPromises(ctx);
     };

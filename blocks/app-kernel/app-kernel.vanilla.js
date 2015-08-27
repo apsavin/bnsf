@@ -233,6 +233,17 @@ modules.define('app-kernel', [
             }
 
             logger.info('Start process page', page);
+
+            return this._postProcessPage(this._renderPage(Page, data), data);
+        },
+
+        /**
+         * @param {Function} Page
+         * @param {RequestData} data
+         * @returns {vow:Promise}
+         * @protected
+         */
+        _renderPage: function (Page, data) {
             var promise;
             try {
                 promise = BEMTREE.apply(this._getBEMJSON(Page, data), data)
@@ -243,7 +254,7 @@ modules.define('app-kernel', [
             } catch (e) {
                 promise = Vow.reject(e);
             }
-            return this._postProcessPage(promise, data);
+            return promise;
         },
 
         /**
