@@ -95,6 +95,30 @@ modules.define('app-kernel', [
         },
 
         /**
+         * @param {Function} Page
+         * @param {RequestData} data
+         * @returns {Object}
+         * @protected
+         */
+        _getBEMJSON: function (Page, data) {
+            return [
+                this._getTitleBEMJSON(Page),
+                this._getPageContentBEMJSON(Page, data)
+            ];
+        },
+
+        /**
+         * @param {Function} Page
+         * @returns {object}
+         * @protected
+         */
+        _getTitleBEMJSON: function (Page) {
+            var bemjson = this.__base(Page);
+            bemjson.tag = 'title';
+            return bemjson;
+        },
+
+        /**
          * @param {RequestData} data
          * @protected
          */
@@ -109,13 +133,10 @@ modules.define('app-kernel', [
          * @protected
          */
         _writeResponse: function (html, data, Page) {
-            var $html = $(html),
-                pageSelector = Page.buildSelector(),
-                $page = $html.filter(pageSelector);
-            $page = $page.length ? $page : $html.find(pageSelector);
-            BEMDOM.replace(this._currentPage.domElem, $page);
+            var $html = $(html);
+            BEMDOM.replace(this._currentPage.domElem, $html[1]);
             this._cacheCurrentPage(Page.getName());
-            document.title = $html.filter('title').text();
+            document.title = $html.eq(0).text();
         },
 
         /**
