@@ -28,13 +28,12 @@ modules.define('controller-api', [
                 if (!route) {
                     this._sendJSON(response, {
                         error: 'no requests'
-                    });
+                    }, 400);
                     return;
-                } else {
-                    routes = route;
-                    routesParameters = routeParameters;
-                    bodies = [data.request];
                 }
+                routes = route;
+                routesParameters = routeParameters;
+                bodies = [data.request];
             }
 
             routes = Array.isArray(routes) ? routes : [routes];
