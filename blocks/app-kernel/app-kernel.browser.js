@@ -89,9 +89,16 @@ modules.define('app-kernel', [
             if (this._isPartialUpdateAvailable(page) && (updatePromise = this._currentPage.update(data))) {
                 return this._postProcessPage(updatePromise, data);
             } else {
-                this._currentPage.leave();
+                this._leaveCurrentPage();
                 return this.__base(page, data);
             }
+        },
+
+        /**
+         * @protected
+         */
+        _leaveCurrentPage: function () {
+            this._currentPage.leave();
         },
 
         /**
