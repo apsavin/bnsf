@@ -1,3 +1,5 @@
 ({
-    shouldDeps: ['i-bem', 'jquery', 'vow', {block: 'functions', elem: 'debounce'}, 'app-logger', 'objects']
+    mustDeps: [
+        'i-bem', 'jquery', {block: 'functions', elem: 'debounce'}, 'app-logger', 'objects', 'api-request'
+    ]
 })

@@ -1,23 +1,16 @@
 /**@module api-requester*/
 modules.define('api-requester', [
-    'jquery', 'vow', 'functions__debounce'
-], function (provide, $, Vow, debounce, ApiRequester) {
+    'jquery', 'functions__debounce', 'api-request'
+], function (provide, $, debounce, ApiRequest, ApiRequester) {
     "use strict";
 
     /**
-     * @param {Deferred} deferred
-     * @param {*} error
-     * @param {XMLHttpRequest} xhr
+     * @param {ApiRequest} request
+     * @returns {ApiRequest}
      */
-    var rejectDeferred = function (deferred, error, xhr) {
-        deferred.reject({
-            error: error,
-            response: {
-                statusCode: xhr.status,
-                statusText: xhr.statusText
-            }
-        });
-    };
+    function isRequestNotAborted (request) {
+        return !request.isAborted();
+    }
 
     /**
      * @class ApiRequester
@@ -34,7 +27,7 @@ modules.define('api-requester', [
                 inited: function () {
                     this.__base();
                     /**
-                     * @type {Object.<Array>}
+                     * @type {Object.<Array.<ApiRequest>>}
                      * @private
                      */
                     this._requests = {};
@@ -71,24 +64,21 @@ modules.define('api-requester', [
          * @param {String} route
          * @param {?Object} [routeParameters]
          * @param {String|Object} [body]
-         * @returns {vow:Promise}
+         * @returns {ApiRequest}
          */
         sendRequest: function (method, route, routeParameters, body) {
             method = method.toLowerCase();
             if (body && !$.isPlainObject(body) && typeof body !== 'string') {
                 return this._sendRequest(method, route, routeParameters, body);
             }
-            var deferred = Vow.defer();
-            this._requests[method].push({
-                data: {
-                    route: route,
-                    routeParameters: routeParameters,
-                    body: body
-                },
-                deferred: deferred
+            var request = new ApiRequest({
+                route: route,
+                routeParameters: routeParameters,
+                body: body
             });
+            this._requests[method].push(request);
             this._sendDebouncedRequests[method]();
-            return deferred.promise();
+            return request;
         },
 
         /**
@@ -143,12 +133,12 @@ modules.define('api-requester', [
          * @param {String} route
          * @param {?Object} routeParameters
          * @param {FormData} body
-         * @returns {vow:Promise}
+         * @returns {ApiRequest}
          * @private
          */
         _sendRequest: function (method, route, routeParameters, body) {
-            var deferred = Vow.defer();
-            this._activeXhrs.push($.ajax({
+            var apiRequest = new ApiRequest();
+            var xhr = $.ajax({
                 url: this._prepareUrl(route, JSON.stringify(routeParameters)),
                 type: method,
                 data: body,
@@ -156,17 +146,19 @@ modules.define('api-requester', [
                 contentType: false,
                 success: function (response) {
                     if (response.error) {
-                        deferred.reject(response);
+                        apiRequest.reject(response);
                     } else {
-                        deferred.resolve(response);
+                        apiRequest.resolve(response);
                     }
                 },
                 error: function (xhr, statusText, error) {
-                    rejectDeferred(deferred, error, xhr);
+                    apiRequest.reject(error, xhr);
                 },
                 complete: this._onXhrComplete
-            }));
-            return deferred.promise();
+            });
+            this._activeXhrs.push(xhr);
+            apiRequest.setRequest(xhr);
+            return apiRequest;
         },
 
         /**
@@ -174,9 +166,12 @@ modules.define('api-requester', [
          * @private
          */
         _sendRequests: function (method) {
-            var requests = this._requests[method];
+            var requests = this._requests[method].filter(isRequestNotAborted);
             this._requests[method] = [];
-            this._activeXhrs.push($.ajax({
+            if (!requests.length) {
+                return;
+            }
+            var xhr = $.ajax({
                 url: this._prepareUrls(method, requests),
                 type: method,
                 dataType: 'json',
@@ -184,26 +179,33 @@ modules.define('api-requester', [
                 success: function (responses, status, xhr) {
                     if (responses.forEach) {
                         responses.forEach(function (response, i) {
-                            var deferred = requests[i].deferred;
+                            var request = requests[i];
                             if (response.error) {
-                                deferred.reject(response);
+                                request.reject(response);
                             } else {
-                                deferred.resolve(response);
+                                request.resolve(response);
                             }
                         });
                     } else {
                         requests.forEach(function (request) {
-                            rejectDeferred(request.deferred, responses, xhr);
+                            request.reject(responses, xhr);
                         });
                     }
                 },
                 error: function (xhr, statusText, error) {
                     requests.forEach(function (request) {
-                        rejectDeferred(request.deferred, error, xhr);
+                        request.reject(error, xhr);
                     });
                 },
                 complete: this._onXhrComplete
-            }));
+            });
+
+            // we can `setRequest` only if we have exactly one `ApiRequest` instance
+            // so `ApiRequest#abort` will really abort xhr
+            if (requests.length === 1) {
+                requests[0].setRequest(xhr);
+            }
+            this._activeXhrs.push(xhr);
         },
 
         /**

@@ -27,7 +27,7 @@ modules.define('api-requester', ['i-bem'], function (provide, BEM) {
         /**
          * @param {String} route
          * @param {?Object} [routeParameters]
-         * @returns {vow:Promise}
+         * @returns {ApiRequest}
          */
         get: function (route, routeParameters) {
             return this.sendRequest('get', route, routeParameters);
@@ -37,7 +37,7 @@ modules.define('api-requester', ['i-bem'], function (provide, BEM) {
          * @param {String} route
          * @param {?Object} [routeParameters]
          * @param {Object} [body]
-         * @returns {vow:Promise}
+         * @returns {ApiRequest}
          */
         post: function (route, routeParameters, body) {
             return this.sendRequest('post', route, routeParameters, body);
@@ -47,7 +47,7 @@ modules.define('api-requester', ['i-bem'], function (provide, BEM) {
          * @param {String} route
          * @param {?Object} [routeParameters]
          * @param {Object} [body]
-         * @returns {vow:Promise}
+         * @returns {ApiRequest}
          */
         put: function (route, routeParameters, body) {
             return this.sendRequest('put', route, routeParameters, body);
@@ -57,7 +57,7 @@ modules.define('api-requester', ['i-bem'], function (provide, BEM) {
          * @param {String} route
          * @param {?Object} [routeParameters]
          * @param {Object} [body]
-         * @returns {vow:Promise}
+         * @returns {ApiRequest}
          */
         patch: function (route, routeParameters, body) {
             return this.sendRequest('patch', route, routeParameters, body);
@@ -66,7 +66,7 @@ modules.define('api-requester', ['i-bem'], function (provide, BEM) {
         /**
          * @param {String} route
          * @param {?Object} [routeParameters]
-         * @returns {vow:Promise}
+         * @returns {ApiRequest}
          */
         del: function (route, routeParameters) {
             return this.sendRequest('delete', route, routeParameters);
@@ -77,7 +77,7 @@ modules.define('api-requester', ['i-bem'], function (provide, BEM) {
          * @param {String} route
          * @param {?Object} [routeParameters]
          * @param {String|Object} [body]
-         * @returns {vow:Promise}
+         * @returns {ApiRequest}
          */
         sendRequest: function (method, route, routeParameters, body) {
 

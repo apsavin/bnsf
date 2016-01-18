@@ -1,7 +1,7 @@
 /**@module api-requester*/
 modules.define('api-requester', [
-    'vow', 'app-logger', 'objects'
-], function (provide, Vow, logger, objects, ApiRequester) {
+    'api-request', 'app-logger', 'objects'
+], function (provide, ApiRequest, logger, objects, ApiRequester) {
     "use strict";
 
     var request = require('request'),
@@ -51,11 +51,11 @@ modules.define('api-requester', [
          * @param {String} [route]
          * @param {?Object} [routeParameters]
          * @param {String|Object|Readable} [body]
-         * @returns {vow:Promise}
+         * @returns {ApiRequest}
          */
         sendRequest: function (method, route, routeParameters, body) {
             var url = this.params.router.generate(route, routeParameters),
-                deferred = Vow.defer(),
+                apiRequest = new ApiRequest(),
                 parsedUrl = URL.parse(url),
                 _this = this,
                 cookieStorage = this._getCookieStorageForHost(parsedUrl.host);
@@ -76,7 +76,7 @@ modules.define('api-requester', [
                     logger.error('API response on ' + method.toUpperCase() + ' ' + url + ' can not be parsed');
                     logger.error('API response body:');
                     logger.error(body);
-                    deferred.reject(e);
+                    apiRequest.reject(e);
                     return;
                 }
 
@@ -102,25 +102,26 @@ modules.define('api-requester', [
                 if (err) {
                     logger.error('API request ' + method.toUpperCase() + ' ' + url + ' error:');
                     logger.error(err);
-                    deferred.reject(output);
+                    apiRequest.reject(output);
                 } else if (badStatus) {
                     logger.warn('API request ' + method.toUpperCase() + ' ' + url + ' has status ' + res.statusCode);
                     logger.warn(output.error);
-                    deferred.reject(output);
+                    apiRequest.reject(output);
                 } else {
-                    deferred.resolve(output);
+                    apiRequest.resolve(output);
                 }
             };
 
+            var req;
             if (body && body instanceof Readable) {
-                body.pipe(request({
+                req = body.pipe(request({
                     url: url,
                     method: method,
                     jar: jar
                 }, requestCallback));
             } else {
                 var preparedBody = typeof body === 'object' ? JSON.stringify(body) : body;
-                request({
+                req = request({
                     url: url,
                     method: method,
                     headers: this._getRequestHeaders(route),
@@ -129,7 +130,8 @@ modules.define('api-requester', [
                     jar: jar
                 }, requestCallback);
             }
-            return deferred.promise();
+            apiRequest.setRequest(req);
+            return apiRequest;
         },
 
         /**
