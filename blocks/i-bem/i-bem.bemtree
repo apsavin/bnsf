@@ -8,6 +8,14 @@ oninit(function (exports, initialContext) {
 
     function BEMContext (ctx, apply, data) {
         OldBEMContext.call(this, ctx, apply);
+
+        /**
+         * we should store initial data for convenient use of reapply
+         * @see BEMContext#applyAsync
+         * @private
+         */
+        this._data = data;
+
         /**
          * @private
          */
@@ -142,7 +150,7 @@ oninit(function (exports, initialContext) {
     initialContext.BEMContext = BEMContext;
 
     exports.apply = BEMContext.applyAsync = function BEMContext_applyAsync (context, data) {
-        var ctx = new initialContext.BEMContext(context || this, oldApply, data);
+        var ctx = new initialContext.BEMContext(context || this, oldApply, data || this._data);
         ctx._buf = ctx.apply();
         return waitForPromises(ctx);
     };
