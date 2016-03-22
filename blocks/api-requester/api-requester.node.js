@@ -5,9 +5,7 @@ modules.define('api-requester', [
     "use strict";
 
     var request = require('request'),
-        URL = require('url'),
-        Readable = require('stream').Readable,
-        defaultCookieStorage = {};
+        Readable = require('stream').Readable;
 
     /**
      * @class ApiRequester
@@ -15,36 +13,6 @@ modules.define('api-requester', [
      * @exports
      */
     provide(ApiRequester.decl(/**@lends ApiRequester.prototype*/{
-
-        getDefaultParams: function () {
-            return objects.extend({
-                cookieStorage: defaultCookieStorage
-            }, this.__base());
-        },
-
-        /**
-         * @param {string} host
-         * @returns {{host: string, cookies: Array.<string>}}
-         * @protected
-         */
-        _getCookieStorageForHost: function (host) {
-            var cookieStorage = this.params.cookieStorage;
-            var cookiesForHosts = cookieStorage.cookies = cookieStorage.cookies || [],
-                cookiesForHost;
-
-            for (var i = 0; i < cookiesForHosts.length; i++) {
-                cookiesForHost = cookiesForHosts[i];
-                if (cookiesForHost.host === host) {
-                    return cookiesForHost;
-                }
-            }
-            cookiesForHost = {
-                host: host,
-                cookies: []
-            };
-            cookiesForHosts.push(cookiesForHost);
-            return cookiesForHost;
-        },
 
         /**
          * @param {String} method
@@ -56,16 +24,8 @@ modules.define('api-requester', [
         sendRequest: function (method, route, routeParameters, body) {
             var url = this.params.router.generate(route, routeParameters),
                 apiRequest = new ApiRequest(),
-                parsedUrl = URL.parse(url),
                 _this = this,
-                cookieStorage = this._getCookieStorageForHost(parsedUrl.host);
-
-            var jar = request.jar();
-            if (cookieStorage.cookies.length) {
-                cookieStorage.cookies.forEach(function (cookie) {
-                    jar.setCookie(cookie, url);
-                });
-            }
+                jar = request.jar(this.params.cookieStorage);
 
             var requestCallback = function (err, res, body) {
                 var parsedBody;
@@ -85,9 +45,6 @@ modules.define('api-requester', [
                     body: parsedBody
                 };
                 if (res) {
-                    cookieStorage.cookies = jar.getCookies(url).map(function (cookie) {
-                        return cookie.toString();
-                    });
                     output.response = {
                         statusCode: res.statusCode,
                         statusText: res.statusText

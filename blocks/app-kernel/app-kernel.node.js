@@ -1,13 +1,14 @@
 /**@module app-kernel*/
 modules.define('app-kernel', [
-    'i-bem', 'controllers', 'app-api-router', 'api-requester', 'objects', 'app-kernel__config', 'parameters'
-], function (provide, BEM, controllers, router, ApiRequester, objects, config, parameters, appDecl) {
+    'i-bem', 'controllers', 'app-api-router', 'api-requester', 'cookie-storage', 'objects', 'app-kernel__config', 'parameters'
+], function (provide, BEM, controllers, router, ApiRequester, SessionCookieStorage, objects, config, parameters, appDecl) {
     "use strict";
 
     /**
      * @typedef {RequestData} NodeRequestData
      * @property {IncomingMessage} request
      * @property {OutgoingMessage} response
+     * @property {SessionCookieStorage} cookieStorage
      */
 
     /**
@@ -79,9 +80,10 @@ modules.define('app-kernel', [
          */
         _fillRequestData: function (data) {
             data = this.__base(data);
+            data.cookieStorage = new SessionCookieStorage(data.request.session);
             data.apiRequester = new ApiRequester(null, {
                 router: router,
-                cookieStorage: data.request.session
+                cookieStorage: data.cookieStorage
             });
             return data;
         },
