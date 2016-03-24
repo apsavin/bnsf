@@ -16,18 +16,20 @@ modules.define('request-listener', ['app-logger'], function (provide, logger, Re
          * @protected
          */
         _getMiddleware: function () {
-            var bodyParser = require('body-parser');
+            var bodyParser = require('body-parser'),
+                session = require('express-session');
             return require('connect')()
                 .use(bodyParser.urlencoded({ extended: true }))
                 .use(bodyParser.json())
-                .use(require('express-session')(this._getSessionParams()));
+                .use(session(this._getSessionParams(session)));
         },
 
         /**
+         * @param {function} session - 'express-session'
          * @returns {{name: string, secret: string}}
          * @protected
          */
-        _getSessionParams: function () {
+        _getSessionParams: function (session) {
             logger.warn('Redefine RequestListener#_getSessionParams: defaults are not safe.');
             return {
                 name: 'sid',
@@ -72,8 +74,5 @@ modules.define('request-listener', ['app-logger'], function (provide, logger, Re
                 port: 3000
             };
         }
-
     }));
-
 });
-
