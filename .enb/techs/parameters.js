@@ -15,7 +15,7 @@ var vowFs = require('vow-fs'),
     inherit = require('inherit'),
     yml = require('js-yaml');
 
-module.exports = inherit(require('enb/lib/tech/base-tech'), {
+module.exports = inherit(require('enb').BaseTech, {
     getName: function () {
         return 'parameters';
     },

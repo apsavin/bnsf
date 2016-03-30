@@ -15,7 +15,7 @@
  * nodeConfig.addTech(require('path/to/node-js-with-sources'));
  * ```
  */
-module.exports = require('enb/lib/build-flow').create()
+module.exports = require('enb').buildFlow.create()
     .name('node-js-with-sources')
     .target('target', '?.node.js')
     .useFileList(['vanilla.js', 'node.js'])

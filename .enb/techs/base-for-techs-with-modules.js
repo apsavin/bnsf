@@ -5,7 +5,7 @@
  * Base tech for techs with ym modules-based output
  *
  */
-module.exports = require('enb/lib/build-flow').create()
+module.exports = require('enb').buildFlow.create()
     .methods({
 
         /**

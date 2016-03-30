@@ -13,10 +13,10 @@
     "bem-xjst": "^0.9.0",
     "body-parser": "~1.12.4",
     "connect": "~3.3.5",
-    "enb": "^0.17.2",
+    "enb": "^1.2.0",
     "enb-bem-techs": "^2.0.1",
-    "enb-bemxjst": "^1.3.5",
-    "enb-borschik": "^1.5.1",
+    "enb-bemxjst": "^1.4.0",
+    "enb-borschik": "^2.3.1",
     "enb-modules": "^0.2.0",
     "express-session": "~1.11.3",
     "inherit": "~2.2.2",
@@ -25,9 +25,10 @@
     "request": "~2.57.0",
     "router-base": "^1.0.0",
     "sibling": "^0.1.3",
-    "tough-cookie": "~2.0.0",
+    "tough-cookie": "~2.2.2",
     "vow": "^0.4.10",
-    "vow-fs": "~0.3.4"
+    "vow-fs": "~0.3.4",
+    "ym": "~0.1.0"
   },
   "keywords": [
     "bem",
@@ -35,7 +36,7 @@
     "spa"
   ],
   "devDependencies": {
-    "bower": "~1.4.1",
+    "bower": "~1.7.7",
     "bower-npm-install": "~0.5.9",
     "lodash.memoize": "^3.0.4",
     "phantom": "^0.8.3",

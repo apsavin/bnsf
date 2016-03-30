@@ -55,12 +55,12 @@ process.on('uncaughtException', function (err) {
                                 process.exit(1);
                             });
                             enbServerProcess.stderr.on('data', function (data) {
-                                console.log('enb server stderr' + data);
+                                console.log('enb server stderr ' + data);
                             });
                             enbServerProcess.stdout.on('data', function onData (data) {
                                 data = data.toString();
                                 console.log(data);
-                                if (/Server started/.test(data)) {
+                                if (/server started/.test(data)) {
                                     enbServerProcess.stdout.removeListener('data', onData);
                                     if (phantomStarted && bnsfStarted) {
                                         _this.callback();
@@ -76,7 +76,7 @@ process.on('uncaughtException', function (err) {
                                 process.exit(1);
                             });
                             appServerProcess.stderr.on('data', function (data) {
-                                console.log('app server stderr' + data);
+                                console.log('app server stderr ' + data);
                             });
                             appServerProcess.stdout.on('data', function onData (data) {
                                 data = data.toString();
