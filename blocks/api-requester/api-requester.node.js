@@ -15,6 +15,12 @@ modules.define('api-requester', [
     provide(ApiRequester.decl(/**@lends ApiRequester.prototype*/{
 
         /**
+         * @type function
+         * @protected
+         */
+        _request: request,
+
+        /**
          * @param {String} method
          * @param {String} [route]
          * @param {?Object} [routeParameters]
@@ -24,10 +30,15 @@ modules.define('api-requester', [
         sendRequest: function (method, route, routeParameters, body) {
             var url = this.params.router.generate(route, routeParameters),
                 apiRequest = new ApiRequest(),
-                _this = this,
-                jar = request.jar(this.params.cookieStorage);
+                _this = this;
 
-            var requestCallback = function (err, res, body) {
+            apiRequest.setRequest(this._sendRequest({
+                route: route,
+                url: url,
+                method: method,
+                body: body,
+                jar: request.jar(this.params.cookieStorage)
+            }, function (err, res, body) {
                 var parsedBody;
 
                 try {
@@ -67,28 +78,38 @@ modules.define('api-requester', [
                 } else {
                     apiRequest.resolve(output);
                 }
-            };
-
-            var req;
-            if (body && body instanceof Readable) {
-                req = body.pipe(request({
-                    url: url,
-                    method: method,
-                    jar: jar
-                }, requestCallback));
-            } else {
-                var preparedBody = typeof body === 'object' ? JSON.stringify(body) : body;
-                req = request({
-                    url: url,
-                    method: method,
-                    headers: this._getRequestHeaders(route),
-                    body: preparedBody,
-                    gzip: true,
-                    jar: jar
-                }, requestCallback);
-            }
-            apiRequest.setRequest(req);
+            }));
             return apiRequest;
+        },
+
+        /**
+         * @param {object} options
+         * @param {string} options.route
+         * @param {string} options.url
+         * @param {string} options.method
+         * @param {string|object} options.body
+         * @param {CookieJar} options.jar
+         * @param {function} requestCallback
+         * @returns {object}
+         * @protected
+         */
+        _sendRequest: function (options, requestCallback) {
+            var body = options.body,
+                requestParameters = {
+                    url: options.url,
+                    method: options.method,
+                    jar: options.jar
+                };
+            if (body && body instanceof Readable) {
+                return body.pipe(this._request(requestParameters, requestCallback));
+            }
+
+            var preparedBody = typeof body === 'object' ? JSON.stringify(body) : body;
+            return this._request(objects.extend(requestParameters, {
+                headers: this._getRequestHeaders(options.route),
+                body: preparedBody,
+                gzip: true
+            }), requestCallback);
         },
 
         /**
