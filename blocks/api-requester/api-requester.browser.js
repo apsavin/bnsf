@@ -68,8 +68,14 @@ modules.define('api-requester', [
          */
         sendRequest: function (method, route, routeParameters, body) {
             method = method.toLowerCase();
-            if (body && !$.isPlainObject(body) && typeof body !== 'string') {
-                return this._sendRequest(method, route, routeParameters, body);
+            if (body) {
+                var typeOfBody = typeof body;
+                if (typeOfBody !== 'string' && typeOfBody !== 'object') {
+                    throw new Error('ApiRequester: type of body should be "string" or "object", "' + typeOfBody + '" given.')
+                }
+                if (typeOfBody === 'object' && !$.isPlainObject(body)) {
+                    return this._sendRequest(method, route, routeParameters, body);
+                }
             }
             var request = new ApiRequest({
                 route: route,
