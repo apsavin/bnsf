@@ -13,6 +13,20 @@ modules.define('api-requester', [
     }
 
     /**
+     * @param {ApiRequest} request
+     * @param {{error: String, response: {statusCode: Number}}} responseData
+     * @lends ApiRequester
+     * @private
+     */
+    function handleRequestByResponse (request, responseData) {
+        if (responseData.error || !ApiRequester.isResponseStatusSuccess(responseData.response.statusCode)) {
+            request.reject(responseData);
+        } else {
+            request.resolve(responseData);
+        }
+    }
+
+    /**
      * @class ApiRequester
      * @extends BEM
      * @exports
@@ -151,11 +165,7 @@ modules.define('api-requester', [
                 processData: false,
                 contentType: false,
                 success: function (response) {
-                    if (response.error) {
-                        apiRequest.reject(response);
-                    } else {
-                        apiRequest.resolve(response);
-                    }
+                    handleRequestByResponse(apiRequest, response);
                 },
                 error: function (xhr, statusText, error) {
                     apiRequest.reject(error, xhr);
@@ -185,12 +195,7 @@ modules.define('api-requester', [
                 success: function (responses, status, xhr) {
                     if (responses.forEach) {
                         responses.forEach(function (response, i) {
-                            var request = requests[i];
-                            if (response.error) {
-                                request.reject(response);
-                            } else {
-                                request.resolve(response);
-                            }
+                            handleRequestByResponse(requests[i], response);
                         });
                     } else {
                         requests.forEach(function (request) {

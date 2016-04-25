@@ -82,7 +82,14 @@ modules.define('api-requester', ['i-bem'], function (provide, BEM) {
         sendRequest: function (method, route, routeParameters, body) {
 
         }
-
+    }, {
+        /**
+         * @param {Number} statusCode
+         * @returns {Boolean}
+         * @protected
+         */
+        isResponseStatusSuccess: function (statusCode) {
+            return statusCode > 199 && statusCode < 300;
+        }
     }));
-
 });

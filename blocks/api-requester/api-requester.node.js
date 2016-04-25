@@ -61,7 +61,7 @@ modules.define('api-requester', [
                         statusText: res.statusText
                     };
                 }
-                var badStatus = res && (res.statusCode < 200 || res.statusCode > 299);
+                var badStatus = res && !ApiRequester.isResponseStatusSuccess(res.statusCode);
                 if (badStatus) {
                     if (!output.error) {
                         output.error = output.body;
