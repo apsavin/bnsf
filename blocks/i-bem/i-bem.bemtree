@@ -151,6 +151,7 @@ oninit(function (exports, initialContext) {
 
     exports.apply = BEMContext.applyAsync = function BEMContext_applyAsync (context, data) {
         var ctx = new initialContext.BEMContext(context || this, oldApply, data || this._data);
+        ctx._promises = this && this._promises ? this._promises : ctx._promises;
         ctx._buf = ctx.apply();
         return waitForPromises(ctx);
     };
