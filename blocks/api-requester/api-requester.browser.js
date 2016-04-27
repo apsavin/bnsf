@@ -19,7 +19,11 @@ modules.define('api-requester', [
      * @private
      */
     function handleRequestByResponse (request, responseData) {
-        if (responseData.error || !ApiRequester.isResponseStatusSuccess(responseData.response.statusCode)) {
+        if (!responseData ||
+            responseData.error ||
+            !responseData.response ||
+            typeof responseData.response.statusCode !== 'number' ||
+            !ApiRequester.isResponseStatusSuccess(responseData.response.statusCode)) {
             request.reject(responseData);
         } else {
             request.resolve(responseData);

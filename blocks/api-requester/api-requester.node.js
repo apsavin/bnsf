@@ -47,8 +47,8 @@ modules.define('api-requester', [
                     logger.error('API response on ' + method.toUpperCase() + ' ' + url + ' can not be parsed');
                     logger.error('API response body:');
                     logger.error(body);
-                    apiRequest.reject(e);
-                    return;
+                    err = e;
+                    parsedBody = body;
                 }
 
                 var output = {
@@ -126,14 +126,14 @@ modules.define('api-requester', [
         },
 
         /**
-         * @param {OutgoingMessage} res
+         * @param {IncomingMessage} res
          * @param {String} body
          * @returns {String|Object}
          * @throws {Error} if JSON is malformed
          * @private
          */
         _processBody: function (res, body) {
-            if (res && /json/.test(res.headers['content-type'])) {
+            if (res && /json/.test(res.headers['content-type']) && res.statusCode !== 204) {
                 return JSON.parse(body);
             }
             return body;
