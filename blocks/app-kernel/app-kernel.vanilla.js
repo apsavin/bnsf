@@ -248,13 +248,23 @@ modules.define('app-kernel', [
             try {
                 promise = BEMTREE.apply(this._getBEMJSON(Page, data), data)
                     .then(function (bemjson) {
-                        this._writeResponse(BEMHTML.apply(bemjson), data, Page);
+                        this._renderBEMJSON(bemjson, data, Page);
                         return data;
                     }, this);
             } catch (e) {
                 promise = Vow.reject(e);
             }
             return promise;
+        },
+
+        /**
+         * @param {*} bemjson
+         * @param {RequestData} data
+         * @param {Function} Page
+         * @protected
+         */
+        _renderBEMJSON: function (bemjson, data, Page) {
+            this._writeResponse(BEMHTML.apply(bemjson), data, Page);
         },
 
         /**
