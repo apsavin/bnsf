@@ -30,3 +30,6 @@
 
 - id: page-9
   path: /page-with-several-requests-in-block
+
+- id: page-10
+  path: /page-with-404-error

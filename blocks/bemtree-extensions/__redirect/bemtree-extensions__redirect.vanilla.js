@@ -5,12 +5,17 @@ modules.define('bemtree-extensions__redirect', function (provide) {
      * shortcut for bemtree
      * @name redirect
      * @type {function}
-     * @param {string} path
+     * @param {string|number} path or statusCode
      */
     var redirect = function (path) {
         var error = new Error("Redirect needed");
-        error.path = path;
-        error.redirect = true;
+        if (typeof path === 'number') {
+            error.response = {statusCode: path};
+        } else {
+            error.path = path;
+            error.redirect = true;
+        }
+
         throw error;
     };
     provide(redirect);
