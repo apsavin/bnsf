@@ -10,7 +10,7 @@ modules.define('history', ['inherit', 'events', 'jquery'], function (provide, in
          * @constructs
          */
         __constructor: function () {
-            var state = window.state;
+            var state = window.history.state;
 
             // Replace null with empty object to catch initial popstate.
             // Initial val must be null (in specification).
