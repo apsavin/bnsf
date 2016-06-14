@@ -10,8 +10,16 @@ modules.define('history', ['inherit', 'events', 'jquery'], function (provide, in
          * @constructs
          */
         __constructor: function () {
-            if (history.state === null) {
-                history.replaceState(undefined, document.title);
+            var state = window.state;
+
+            // Replace null with empty object to catch initial popstate.
+            // Initial val must be null (in specification).
+            // But in the UC browser for Android history.state is always undefined.
+            if(state === null || typeof state === 'undefined') {
+                // In the Chrome browser for iOS when history.state
+                // replaced with undefined the popstate event will not be triggered.
+                // So, we can replace it with empty object.
+                window.history.replaceState({}, document.title, window.location.href);
             }
             this._sensibleUrlFragment = this._getSensibleUrlFragment();
             $(window).on('popstate', this._onPopState.bind(this));
