@@ -91,9 +91,9 @@ modules.define('api-requester', [
                 if (typeOfBody !== 'string' && typeOfBody !== 'object') {
                     throw new Error('ApiRequester: type of body should be "string" or "object", "' + typeOfBody + '" given.')
                 }
-                if (typeOfBody === 'object' && !$.isPlainObject(body)) {
-                    return this._sendRequest(method, route, routeParameters, body);
-                }
+            }
+            if (!this._canRequestBeCombined(method, route, routeParameters, body)) {
+                return this._sendRequest(method, route, routeParameters, body);
             }
             var request = new ApiRequest({
                 route: route,
@@ -103,6 +103,18 @@ modules.define('api-requester', [
             this._requests[method].push(request);
             this._sendDebouncedRequests[method]();
             return request;
+        },
+
+        /**
+         * @param {String} method
+         * @param {String} route
+         * @param {?Object} [routeParameters]
+         * @param {String|Object} [body]
+         * @returns {Boolean}
+         * @protected
+         */
+        _canRequestBeCombined: function (method, route, routeParameters, body) {
+            return !(body && typeof body === 'object' && !$.isPlainObject(body));
         },
 
         /**
