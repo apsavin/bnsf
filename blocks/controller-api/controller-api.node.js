@@ -33,7 +33,15 @@ modules.define('controller-api', [
                 }
                 routes = route;
                 routesParameters = routeParameters;
-                bodies = [data.request];
+
+                // router may parse 'r[]=route' as {r: ['route']} instead of {'r[]': 'route'}
+                // or 'r=route1&r=route2' as {r: ['route1', 'route2']}
+                // we should treat request as body only if we have 'r=route' (parsed as {r: 'route'}) query string 
+                // (notice the difference between single route as a string and single route as an array of one element)
+                // it allows to `pipe` single requests directly to the api
+                if (!Array.isArray(routes)) {
+                    bodies = [data.request];
+                }
             }
 
             routes = Array.isArray(routes) ? routes : [routes];
